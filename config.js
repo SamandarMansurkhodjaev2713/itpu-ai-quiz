@@ -1,0 +1,10 @@
+window.ITPU_CONFIG={
+  mode:'live',
+  endpoint:'',
+  consentApproved:false,
+  eventId:'ITPU-AI-QUIZ-2026',
+  seconds:10,
+  prizeAt:8,
+  privacyUrl:'https://itpu.uz/privacy',
+  admissions:{ru:'https://itpu.uz/ru/bacheloradmission',uz:'https://itpu.uz/bacheloradmission',en:'https://itpu.uz/en/bacheloradmission'}
+};

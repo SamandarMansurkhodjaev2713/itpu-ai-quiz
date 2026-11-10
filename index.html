@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#091421">
+  <meta name="description" content="ITPU AI Quiz — десять вопросов об искусственном интеллекте от IT Park University.">
+  <meta property="og:title" content="ITPU AI Quiz — Your AI Instinct">
+  <meta property="og:description" content="10 questions · 10 seconds each · IT Park University">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/montserrat.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <title>ITPU AI Quiz — IT Park University</title>
+</head>
+<body data-stage="intro">
+  <a class="skip" href="#screen">Skip to content</a>
+  <div class="atmosphere" aria-hidden="true"><div class="atmosphere__grid"></div><div class="atmosphere__aura"></div><canvas id="ambient-canvas"></canvas></div>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="header-brand"><a class="brand" href="./" aria-label="IT Park University"><img alt="ITPU" src="assets/itpu-logo.svg" width="106" height="52"></a><span class="brand-separator"></span><span class="brand-caption" id="brand-caption">ITPU AI QUIZ</span></div>
+      <div class="header-tools"><span class="header-code">ITPU / 001</span><div class="language" role="group" aria-label="Language"><button data-lang="uz" type="button">UZ</button><button data-lang="ru" type="button">RU</button><button data-lang="en" type="button">EN</button></div></div>
+    </header>
+    <main id="screen" class="screen" tabindex="-1"></main>
+    <footer class="site-footer"><span>IT PARK UNIVERSITY / TASHKENT</span><i></i><span>THINK FORWARD</span></footer>
+  </div>
+  <div class="wipe" id="wipe" aria-hidden="true"><span>ITPU<span class="wipe-dot">.</span></span></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <dialog id="privacy-dialog" class="privacy-dialog" aria-labelledby="privacy-title"><button id="privacy-close" class="privacy-close" type="button" aria-label="Close">×</button><span class="eyebrow">ITPU / PRIVACY</span><h2 id="privacy-title"></h2><p id="privacy-copy"></p><a id="privacy-link" href="https://itpu.uz/privacy" target="_blank" rel="noopener noreferrer"></a></dialog>
+  <iframe hidden name="itpu-post-target" title="Registration transport" tabindex="-1"></iframe>
+  <script src="config.js"></script><script src="copy.js"></script><script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
