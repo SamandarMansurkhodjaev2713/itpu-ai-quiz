@@ -12,7 +12,7 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const STORAGE = 'itpu-ai-quiz-progress-v3';
   const st = {language:0,stage:'intro',session:null,index:0,answers:[],orders:{},deadlineEpoch:0,locked:false,result:null,recap:false,processing:false,pending:null};
-  let frame=0,timeout=0,transitioning=false,toastTimeout=0;
+  let frame=0,timeout=0,transitioning=false,queuedTransition=null,toastTimeout=0;
 
   const L = value => Array.isArray(value) ? value[st.language] : value;
   const T = name => L(WORDS[name]) || name;
@@ -70,10 +70,10 @@
   function enterStage(stage){st.stage=stage;document.body.dataset.stage=stage;save();render();window.scrollTo?.(0,0);root.focus({preventScroll:true});}
   function transition(stage,after){
     cancelAnimationFrame(frame);clearTimeout(timeout);
-    if(transitioning)return;
+    if(transitioning){queuedTransition={stage,after};return;}
     if(reduced.matches){enterStage(stage);after?.();return;}
     transitioning=true;wipe.classList.remove('leave');wipe.classList.add('cover');
-    setTimeout(()=>{enterStage(stage);wipe.classList.remove('cover');wipe.classList.add('leave');setTimeout(()=>{wipe.classList.remove('leave');transitioning=false;after?.();},490);},460);
+    setTimeout(()=>{enterStage(stage);wipe.classList.remove('cover');wipe.classList.add('leave');setTimeout(()=>{wipe.classList.remove('leave');transitioning=false;after?.();if(queuedTransition){const next=queuedTransition;queuedTransition=null;transition(next.stage,next.after);}},490);},460);
   }
 
   function intro(){return `<section class="hero" aria-labelledby="hero-title">
@@ -222,13 +222,32 @@
       st.result={score:result.score,correct:result.correct,claimCode:result.claimCode||''};st.recap=false;st.deadlineEpoch=0;transition('result');
     }catch(err){enterStage('error');}finally{st.processing=false;}
   }
-  function jsonp(id){return new Promise((resolve,reject)=>{
-    const callback='itpuStatus_'+randomId().replace(/-/g,'').slice(0,16),url=new URL(C.endpoint),script=document.createElement('script');
-    url.searchParams.set('action','status');url.searchParams.set('id',id);url.searchParams.set('prefix',callback);
-    const cleanup=()=>{clearTimeout(timeoutId);delete window[callback];script.remove();};
-    const timeoutId=setTimeout(()=>{cleanup();reject(new Error('Status timed out'));},3900);
-    window[callback]=data=>{cleanup();resolve(data);};script.onerror=()=>{cleanup();reject(new Error('Status failed'));};script.src=url.toString();document.head.appendChild(script);
-  });}
+  let statusFrame=null, statusFrameReady=null;
+  function jsonp(id){
+    // Chrome's credentialless iframe prevents Google multi-login redirects from
+    // returning an HTML error instead of the status script. Other browsers use
+    // the original JSONP path; multi-login may still require a private window.
+    if('credentialless' in HTMLIFrameElement.prototype){
+      if(!statusFrame){
+        statusFrame=document.createElement('iframe');statusFrame.hidden=true;statusFrame.credentialless=true;statusFrame.src='bridge.html';
+        statusFrameReady=new Promise((resolve,reject)=>{statusFrame.onload=resolve;statusFrame.onerror=reject;});document.body.appendChild(statusFrame);
+      }
+      return statusFrameReady.then(()=>new Promise((resolve,reject)=>{
+        const token=randomId().replace(/-/g,'').slice(0,24);
+        const cleanup=()=>{clearTimeout(timerId);window.removeEventListener('message',receive);};
+        const timerId=setTimeout(()=>{cleanup();reject(new Error('Status timed out'));},7000);
+        const receive=e=>{if(e.source!==statusFrame.contentWindow||e.origin!==location.origin||e.data?.type!=='itpu-response'||e.data.token!==token)return;cleanup();if(e.data.error)reject(new Error('Status failed'));else resolve(e.data.data);};
+        window.addEventListener('message',receive);statusFrame.contentWindow.postMessage({type:'itpu-query',token,id,endpoint:C.endpoint},location.origin);
+      }));
+    }
+    return new Promise((resolve,reject)=>{
+      const callback='itpuStatus_'+randomId().replace(/-/g,'').slice(0,16),url=new URL(C.endpoint),script=document.createElement('script');
+      url.searchParams.set('action','status');url.searchParams.set('id',id);url.searchParams.set('prefix',callback);
+      const cleanup=()=>{clearTimeout(timeoutId);delete window[callback];script.remove();};
+      const timeoutId=setTimeout(()=>{cleanup();reject(new Error('Status timed out'));},7000);
+      window[callback]=data=>{cleanup();resolve(data);};script.onerror=()=>{cleanup();reject(new Error('Status failed'));};script.src=url.toString();document.head.appendChild(script);
+    });
+  }
   async function submitBridge(payload,required){
     if(!/^https:\/\/script\.google\.com\/macros\/s\//.test(C.endpoint))throw new Error('Invalid endpoint');
     // Apps Script is quota-limited. Three idempotent attempts allow recovery

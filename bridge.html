@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><title>ITPU transport</title><script>
+'use strict';
+window.addEventListener('message',function(e){
+  if(e.source!==parent||e.origin!==location.origin||!e.data||e.data.type!=='itpu-query')return;
+  var token=String(e.data.token||'');if(!/^[a-f0-9]{16,32}$/.test(token))return;
+  var url;try{url=new URL(e.data.endpoint);if(url.origin!=='https://script.google.com'||!url.pathname.startsWith('/macros/s/'))return;}catch(_){return;}
+  var callback='itpuStatus_'+token,script=document.createElement('script');
+  url.searchParams.set('action','status');url.searchParams.set('id',e.data.id);url.searchParams.set('prefix',callback);
+  function cleanup(){delete window[callback];script.remove();}
+  window[callback]=function(data){cleanup();parent.postMessage({type:'itpu-response',token:token,data:data},location.origin);};
+  script.onerror=function(){cleanup();parent.postMessage({type:'itpu-response',token:token,error:true},location.origin);};
+  script.src=url.href;document.head.appendChild(script);
+});
+</script>
