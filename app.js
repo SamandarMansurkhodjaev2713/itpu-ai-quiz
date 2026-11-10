@@ -90,7 +90,8 @@
     <aside class="form-aside"><div class="form-aside-num" aria-hidden="true">10</div><p>${E(T('regDesc'))}</p></aside>
     <div class="form-panel"><p class="form-kicker">ITPU / AI CHALLENGE</p><h1 id="form-heading">${E(T('regTitle'))}</h1><p class="form-desc">${E(T('regDesc'))}</p>
       <form id="lead-form" novalidate><div class="form-grid">
-        <label class="field full"><span>${E(T('name'))} *</span><input name="fullname" maxlength="90" autocomplete="name" required placeholder="${E(T('namePlaceholder'))}"></label>
+        <label class="field name-field"><span>${E(T('firstName'))} *</span><input name="firstName" maxlength="44" autocomplete="given-name" required></label>
+        <label class="field name-field"><span>${E(T('lastName'))} *</span><input name="lastName" maxlength="44" autocomplete="family-name" required></label>
         <label class="field phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" maxlength="22" autocomplete="tel" placeholder="+998 90 123 45 67" required></label>
         <label class="field"><span>${E(T('grade'))} *</span><select name="grade" required><option value="">${E(T('gradeChoose'))}</option><option value="10">${E(T('grade10'))}</option><option value="11">${E(T('grade11'))}</option><option value="other">${E(T('gradeOther'))}</option></select></label>
         <label class="field"><span>${E(T('school'))} <small>(${E(T('optional'))})</small></span><input name="school" maxlength="100" placeholder="${E(T('schoolPlaceholder'))}"></label>
@@ -149,9 +150,9 @@
   function formError(message){const el=document.getElementById('reg-error');if(el){el.textContent=message;el.hidden=false;}}
   async function register(form){
     if(st.processing)return;
-    const name=form.elements.fullname.value.trim().replace(/\s+/g,' '),phone=phoneNumber(form.elements.phone.value),grade=form.elements.grade.value,school=form.elements.school.value.trim(),age=form.elements.age.value;
+    const firstName=form.elements.firstName.value.trim().replace(/\s+/g,' '),lastName=form.elements.lastName.value.trim().replace(/\s+/g,' '),name=`${firstName} ${lastName}`,phone=phoneNumber(form.elements.phone.value),grade=form.elements.grade.value,school=form.elements.school.value.trim(),age=form.elements.age.value;
     const consent=!!form.elements.consent.checked,guardian=!!form.elements.guardian.checked,marketing=!!form.elements.marketing.checked;
-    if(name.length<2)return formError(T('errName'));
+    if(!firstName||!lastName)return formError(T('errName'));
     if(!phone)return formError(T('errPhone'));
     if(!grade||!age)return formError(T('ageChoose'));
     if(age==='minor'&&!guardian)return formError(T('errGuardian'));

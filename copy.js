@@ -12,7 +12,7 @@ window.ITPU_COPY = {
   regKicker:['ШАГ 01 / РЕГИСТРАЦИЯ','01-BOSQICH / RO‘YXAT','STEP 01 / REGISTER'],
   regTitle:['Сначала познакомимся.','Avval tanishib olaylik.','First, let’s meet.'],
   regDesc:['Пара деталей — и ты в игре. Правильные ответы откроются только в конце.','Bir nechta ma’lumot — va o‘yindasan. To‘g‘ri javoblar faqat oxirida ochiladi.','A few details and you are in. Correct answers unlock only at the end.'],
-  name:['Имя и фамилия','Ism va familiya','Full name'],namePlaceholder:['Как тебя зовут?','Isming va familiyang?','What is your name?'],
+  firstName:['Имя','Ism','First name'],lastName:['Фамилия','Familiya','Last name'],
   phone:['Телефон','Telefon','Phone'],grade:['Класс','Sinf','Grade'],gradeChoose:['Выбери класс','Sinfni tanla','Choose grade'],
   grade10:['10 класс','10-sinf','Grade 10'],grade11:['11 класс','11-sinf','Grade 11'],gradeOther:['Другое','Boshqa','Other'],
   school:['Школа','Maktab','School'],optional:['необязательно','ixtiyoriy','optional'],schoolPlaceholder:['Номер или название школы','Maktab raqami yoki nomi','School name or number'],

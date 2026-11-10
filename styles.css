@@ -280,6 +280,7 @@ body.motion-paused .signal-trace{animation-play-state:paused}
  .hero h1{max-width:12ch}
 }
 @media(max-width:550px){
+ .name-field{grid-column:1/-1}
  .site-header{min-height:68px;padding-block:10px}
  .screen{padding-top:12px}
  .hero-copy{padding-top:18px}
