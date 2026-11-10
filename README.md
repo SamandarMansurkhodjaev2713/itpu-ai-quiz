@@ -1,3 +1,3 @@
 # ITPU AI Quiz
 
-GitHub Pages frontend for the ITPU AI Quiz. Guest play uses Google Apps Script and Google Sheets. Registration and collection of personal data remain disabled pending ITPU consent approval. Server code and the answer key are not included in this public repository. The service has not been load-tested for 150 concurrent participants.
+Public frontend for ITPU AI Quiz. Registration is enabled after organizer confirmation; guest play is disabled. Google Apps Script processes and stores results. Server code and the answer key are not part of this public repository. Before the event, review the organizer checklist and confirm the separate parental-consent process for minors.

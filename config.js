@@ -1,7 +1,7 @@
 window.ITPU_CONFIG={
   mode:'live',
   endpoint:'https://script.google.com/macros/s/AKfycbwkTYxxAAL9tpUH28Sq_RyQEqMAVqkHSgzm9ene7DMjWXp9WNu412fXzs-KfCld-97_8g/exec',
-  consentApproved:false,
+  consentApproved:true,
   eventId:'ITPU-AI-QUIZ-2026',
   seconds:10,
   prizeAt:8,

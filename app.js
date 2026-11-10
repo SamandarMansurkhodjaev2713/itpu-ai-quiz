@@ -10,7 +10,7 @@
   const dialog = document.getElementById('privacy-dialog');
   const toast = document.getElementById('toast');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const STORAGE = 'itpu-ai-quiz-progress-v3';
+  const STORAGE = 'itpu-ai-quiz-progress-v4';
   const st = {language:0,stage:'intro',session:null,index:0,answers:[],orders:{},deadlineEpoch:0,locked:false,result:null,recap:false,processing:false,pending:null};
   let frame=0,timeout=0,transitioning=false,queuedTransition=null,toastTimeout=0;
 
@@ -19,7 +19,7 @@
   const E = str => String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
   const randomId = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)),n=>n.toString(16).padStart(2,'0')).join('');
-  const btn = (label,action='')=>`<button class="main-button" type="button" data-action="${action}"><span>${E(label)}</span><span class="button-arrow" aria-hidden="true">↗</span></button>`;
+  const btn = (label,action='')=>`<button class="main-button" type="button" data-action="${action}"><span>${E(label)}</span><span class="button-arrow" aria-hidden="true"></span></button>`;
 
   function save(){
     try{
@@ -50,7 +50,7 @@
     document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));
     document.getElementById('privacy-title').textContent=T('privacyTitle');
     document.getElementById('privacy-copy').textContent=T('privacyBody');
-    document.getElementById('privacy-link').textContent=T('privacyOfficial')+' ↗';
+    document.getElementById('privacy-link').textContent=T('privacyOfficial');
     document.getElementById('privacy-link').href=C.privacyUrl;
     document.getElementById('privacy-close').setAttribute('aria-label',T('close'));
     if(DEMO){const ribbon=document.getElementById('demo-ribbon');if(ribbon)ribbon.textContent=T('demo');}
@@ -82,9 +82,11 @@
       <p class="hero-lead">${E(T('heroText'))}</p>${btn(T('start'),'intro-start')}
       <p class="hero-note">${E(T('introHint'))}</p>
       <div class="hero-stats"><div class="stat"><strong>10</strong><span>${E(T('questions'))}</span></div><div class="stat"><strong>10s</strong><span>${E(T('seconds'))}</span></div><div class="stat"><strong>8/10</strong><span>${E(T('prize'))}</span></div></div>
-    </div><div class="hero-visual" aria-hidden="true"><small>NEURAL FIELD / 001</small><div class="orb-wrap"><div class="orb-glow"></div><div class="orb-ring"></div><div class="orb-ring orb-ring--two"></div><div class="orb-ring orb-ring--three"></div><div class="orb"></div><div class="orb-chip">AI / HUMAN INTERFACE<b>001—010</b></div></div></div>
+    </div><div class="hero-visual" aria-hidden="true"><svg class="signal" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="signal-gradient" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#1889df" stop-opacity="0"/><stop offset=".35" stop-color="#66c6ff"/><stop offset=".7" stop-color="#d0eeff"/><stop offset="1" stop-color="#1889df" stop-opacity="0"/></linearGradient></defs>${Array.from({length:15},(_,i)=>`<path style="--line:${i}" d="M 0 ${54+i*21} C 135 ${52+i*21} 155 ${335-i*15} 300 ${200} S 465 ${55+i*21} 600 ${54+i*21}"/>`).join('')}</svg></div>
   </section>`;}
-  function formMarkup(){return `<section class="form-shell" aria-labelledby="form-heading">
+  function formMarkup(){
+    if(!DEMO && !C.consentApproved)return `<section class="registration-paused" aria-labelledby="paused-title"><div class="paused-mark" aria-hidden="true"></div><h1 id="paused-title">${E(T('registrationPausedTitle'))}</h1><p>${E(T('registrationPausedBody'))}</p></section>`;
+    return `<section class="form-shell" aria-labelledby="form-heading">
     <aside class="form-aside"><div class="eyebrow">${E(T('regKicker'))}</div><div class="form-aside-num" aria-hidden="true">01</div><div><h2>${E(T('regTitle'))}</h2><p>${E(T('regDesc'))}</p></div></aside>
     <div class="form-panel"><p class="form-kicker">ITPU / AI CHALLENGE</p><h1 id="form-heading">${E(T('regTitle'))}</h1><p class="form-desc">${E(T('regDesc'))}</p>
       <form id="lead-form" novalidate><div class="form-grid">
@@ -98,7 +100,7 @@
       <label class="check"><input name="consent" type="checkbox" required><span>${E(T('consent'))}</span></label>
       <label class="check"><input name="marketing" type="checkbox"><span>${E(T('marketing'))}</span></label>
       <div style="margin-top:8px"><button type="button" class="text-link" data-action="privacy">${E(T('privacy'))}</button></div>
-      <div class="reg-actions"><p id="reg-error" class="reg-error" role="alert" hidden></p><button type="submit" id="reg-submit" class="main-button"><span>${E(T('register'))}</span><span class="button-arrow" aria-hidden="true">↗</span></button><button type="button" class="guest" data-action="guest">${E(T('guest'))}</button></div>
+      <div class="reg-actions"><p id="reg-error" class="reg-error" role="alert" hidden></p><button type="submit" id="reg-submit" class="main-button"><span>${E(T('register'))}</span><span class="button-arrow" aria-hidden="true"></span></button></div>
       </form></div>
   </section>`;}
   function ready(){return `<section class="ready" aria-labelledby="ready-heading"><div class="eyebrow">${E(T('readyKicker'))}</div><div class="ready-number" aria-hidden="true">10</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p>${btn(T('readyGo'),'quiz-start')}</section>`;}
@@ -114,7 +116,7 @@
       <div class="progress" role="progressbar" aria-valuenow="${st.index+1}" aria-valuemin="1" aria-valuemax="10"><span style="width:${st.index*10}%"></span></div>
       <div class="quiz-grid"><div class="question-side"><div><div class="question-tag">${E(L(q.tag))}</div><h1 id="question-title">${E(L(q.q))}</h1></div>
         <div class="timer-block"><div class="timer" role="timer" aria-label="${E(T('left'))}"><svg viewBox="0 0 110 110" aria-hidden="true"><circle class="timer-track" cx="55" cy="55" r="48"/><circle id="timer-progress" class="timer-progress" cx="55" cy="55" r="48" stroke-dasharray="301.593" stroke-dashoffset="0"/></svg><strong id="time-count">10</strong></div><div class="timer-label"><span>${E(T('left'))}</span><b id="quiz-hint">${E(T('choose'))}</b></div></div>
-      </div><div class="answers" role="group" aria-label="${E(T('choose'))}">${order.map((answerIndex,i)=>`<button class="answer" type="button" data-action="answer" data-answer="${answerIndex}"><span class="answer-key" aria-hidden="true">${'ABCDE'[i]}</span><span class="answer-text">${E(L(q.a[answerIndex]))}</span><span class="answer-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div>
+      </div><div class="answers" role="group" aria-label="${E(T('choose'))}">${order.map((answerIndex,i)=>`<button class="answer" type="button" data-action="answer" data-answer="${answerIndex}"><span class="answer-key" aria-hidden="true">${'ABCDE'[i]}</span><span class="answer-text">${E(L(q.a[answerIndex]))}</span><span class="answer-arrow" aria-hidden="true"></span></button>`).join('')}</div></div>
       <div class="quiz-foot"><span>ITPU / THINK FORWARD</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     </section>`;
   }
@@ -125,17 +127,17 @@
     const r=st.result,s=r.score,eligible=s>=C.prizeAt&&!st.session.guest;
     const guestOrDemo=DEMO||st.session.guest;
     return `<section class="results" aria-labelledby="result-title"><div class="result-main"><div class="eyebrow">${E(T('resultKicker'))}</div><h1 id="result-title">${E(T('resultTitle'))}</h1><div class="score"><strong>${s}</strong><span>${E(T('outOf'))}</span></div><span class="result-badge">${['AI ROOKIE','AI EXPLORER','AI THINKER','AI VISIONARY','AI PIONEER'][tier(s)]}</span><p>${E(T('tier'+tier(s)))}</p>
-      <div class="result-tools"><button class="secondary-button" type="button" data-action="share">↗ ${E(T('share'))}</button>${DEMO?`<button class="secondary-button" type="button" data-action="replay">↺ ${E(T('replay'))}</button>`:''}</div></div>
+      <div class="result-tools"><button class="secondary-button" type="button" data-action="share">${E(T('share'))}</button>${DEMO?`<button class="secondary-button" type="button" data-action="replay">${E(T('replay'))}</button>`:''}</div></div>
       <div class="result-card"><span class="micro">ITPU / NEXT LEVEL</span><h2>${E(eligible?T('eligible'):T('ctaTitle'))}</h2><p>${E(guestOrDemo?T('demoPrize'):(eligible?T('prizeInstructions'):T('noPrize')))}</p>
         ${eligible?`<div class="claim"><small>${E(T('code'))}</small><strong>${E(r.claimCode||'ITPU-******')}</strong></div>`:''}
-        <a class="main-button" href="${E(C.admissions[LANGS[st.language]])}" target="_blank" rel="noopener noreferrer"><span>${E(T('cta'))}</span><span class="button-arrow" aria-hidden="true">↗</span></a>
+        <a class="main-button" href="${E(C.admissions[LANGS[st.language]])}" target="_blank" rel="noopener noreferrer"><span>${E(T('cta'))}</span><span class="button-arrow" aria-hidden="true"></span></a>
       </div><div class="recap"><button class="recap-toggle" type="button" data-action="recap" aria-expanded="${st.recap}">${E(st.recap?T('recapClose'):T('recapOpen'))}<span aria-hidden="true">+</span></button><div class="recap-list" id="recap-list" ${st.recap?'':'hidden'}>${st.recap?recapMarkup():''}</div></div>
     </section>`;
   }
   function recapMarkup(){return Q.map((q,i)=>{
     const chosen=st.answers.find(a=>a.id===q.id),correct=st.result.correct[q.id],ok=chosen&&chosen.answer===correct;
     const wrong=chosen?.answer===null||!chosen?'':`<div class="wrong">${E(T('yourAnswer'))}: ${E(L(q.a[chosen.answer]))}</div>`;
-    return `<article class="recap-item"><small>${E(T('question'))} ${String(i+1).padStart(2,'0')} · ${ok?'✓':'×'}</small><h3>${E(L(q.q))}</h3>${ok?'':(wrong||`<div class="wrong">${E(T('skipped'))}</div>`)}<div>✓ ${E(T('correct'))}: ${E(L(q.a[correct]))}</div>${q.why?`<p>${E(L(q.why))}</p>`:''}</article>`;
+    return `<article class="recap-item"><small>${E(T('question'))} ${String(i+1).padStart(2,'0')}</small><h3>${E(L(q.q))}</h3>${ok?'':(wrong||`<div class="wrong">${E(T('skipped'))}</div>`)}<div>${E(T('correct'))}: ${E(L(q.a[correct]))}</div>${q.why?`<p>${E(L(q.why))}</p>`:''}</article>`;
   }).join('');}
   function render(){
     root.classList.remove('enter');void root.offsetWidth;root.classList.add('enter');
@@ -163,12 +165,11 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-DRAFT-V1'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
       st.session={id,guest:false};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
   }
-  function guest(){st.session={id:randomId(),guest:true};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');}
   function startQuiz(){if(!st.session||st.processing)return;if(transitioning){setTimeout(startQuiz,500);return;}st.answers=[];st.orders={};st.index=0;st.deadlineEpoch=0;st.locked=false;if(DEMO)transition('quiz',()=>timer(true));else {st.pending={action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}}
   function timer(newQuestion){
     cancelAnimationFrame(frame);
@@ -268,14 +269,14 @@
   function replay(){st.session=null;st.answers=[];st.orders={};st.index=0;st.result=null;st.recap=false;save();transition('intro');}
   function ambient(){
     const canvas=document.getElementById('ambient-canvas'),ctx=canvas?.getContext('2d');if(!ctx)return;
-    let width=0,height=0,dpr=1,last=0;
-    const resize=()=>{width=innerWidth;height=innerHeight;dpr=Math.min(devicePixelRatio||1,1.6);canvas.width=width*dpr;canvas.height=height*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);};resize();addEventListener('resize',resize,{passive:true});
-    let ambientFrame=0;
-    const draw=time=>{ambientFrame=requestAnimationFrame(draw);if(time-last<50)return;last=time;ctx.clearRect(0,0,width,height);const count=width<620?17:39,seed=time*.00012,points=[];
-      for(let i=0;i<count;i++){const angle=i*2.39996+seed,r=Math.sqrt((i+.3)/count)*Math.min(width,height)*(width<620?.43:.69);points.push([width*(width<620?.57:.73)+Math.cos(angle)*r+Math.sin(seed*3+i)*4,height*.5+Math.sin(angle)*r]);}
-      for(let i=0;i<points.length;i++){const a=points[i];for(let j=i+1;j<Math.min(points.length,i+5);j++){const b=points[j],dist=Math.hypot(a[0]-b[0],a[1]-b[1]);if(dist>Math.min(width,height)*.25)continue;ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.strokeStyle=`rgba(100,177,238,${Math.max(.02,.15-dist/1600)})`;ctx.lineWidth=.7;ctx.stroke();}ctx.beginPath();ctx.arc(a[0],a[1],i%6===0?2:1.1,0,Math.PI*2);ctx.fillStyle=i%6===0?'#72c7ff78':'#5ab2ef37';ctx.fill();}
+    let w=0,h=0,frame=0,last=0;
+    const resize=()=>{w=innerWidth;h=innerHeight;const d=Math.min(devicePixelRatio||1,1.4);canvas.width=w*d;canvas.height=h*d;ctx.setTransform(d,0,0,d,0,0);};
+    resize();addEventListener('resize',resize,{passive:true});
+    const draw=t=>{frame=requestAnimationFrame(draw);if(t-last<60)return;last=t;ctx.clearRect(0,0,w,h);
+      const light=document.body.dataset.stage==='form'||document.body.dataset.stage==='quiz';
+      for(let i=0;i<5;i++){const base=h*(.24+i*.15),drift=Math.sin(t*.00018+i*.6)*h*.035;ctx.beginPath();ctx.moveTo(-40,base);ctx.bezierCurveTo(w*.32,base-h*.12+drift,w*.63,base+h*.1-drift,w+40,base-h*.02);ctx.strokeStyle=light?'rgba(22,104,170,.14)':'rgba(105,194,249,.12)';ctx.lineWidth=1;ctx.stroke();}
     };
-    const sync=()=>{cancelAnimationFrame(ambientFrame);ambientFrame=0;if(!document.hidden&&!reduced.matches)ambientFrame=requestAnimationFrame(draw);else ctx.clearRect(0,0,width,height);};
+    const sync=()=>{cancelAnimationFrame(frame);if(!document.hidden&&!reduced.matches)frame=requestAnimationFrame(draw);else ctx.clearRect(0,0,w,h);};
     document.addEventListener('visibilitychange',sync);reduced.addEventListener?.('change',sync);sync();
   }
   root.addEventListener('click',event=>{
@@ -283,7 +284,6 @@
     switch(button.dataset.action){
       case 'intro-start':transition('form');break;
       case 'privacy':dialog.showModal();break;
-      case 'guest':guest();break;
       case 'quiz-start':startQuiz();break;
       case 'answer':choose(Number(button.dataset.answer));break;
       case 'retry-score':if(!DEMO){st.pending=st.pending||{action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}else finish();break;

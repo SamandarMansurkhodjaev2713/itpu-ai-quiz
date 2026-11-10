@@ -1,5 +1,7 @@
 // Russian / Uzbek / English, in this order.
 window.ITPU_COPY = {
+  registrationPausedTitle:['Регистрация скоро откроется.','Ro‘yxatdan o‘tish tez orada ochiladi.','Registration opens soon.'],
+  registrationPausedBody:['Организаторы готовят регистрацию. Попробуй вернуться позже.','Tashkilotchilar ro‘yxatdan o‘tishni tayyorlamoqda. Keyinroq qayta kiring.','The organizers are preparing registration. Please check back later.'],
   brand:['ITPU AI QUIZ','ITPU AI QUIZ','ITPU AI QUIZ'],
   eyebrow:['ITPU AI QUIZ / IT PARK UNIVERSITY','ITPU AI QUIZ / IT PARK UNIVERSITY','ITPU AI QUIZ / IT PARK UNIVERSITY'],
   heroA:['ТВОЙ AI','SENING AI','YOUR AI'],heroB:['ИНСТИНКТ.','SEZGING.','INSTINCT.'],
@@ -49,7 +51,7 @@ window.ITPU_COPY = {
   cta:['Посмотреть программы ITPU','ITPU dasturlarini ko‘rish','Explore ITPU programs'],ctaTitle:['Вопросы закончились. Возможности — нет.','Savollar tugadi. Imkoniyatlar esa yo‘q.','Questions end. Possibilities don’t.'],
   share:['Поделиться результатом','Natijani ulashish','Share result'],copied:['Ссылка скопирована','Havola nusxalandi','Link copied'],replay:['Пройти демо ещё раз','Demoni qayta boshlash','Play demo again'],
   privacyTitle:['Как используются данные','Ma’lumotlar qanday ishlatiladi','How your data is used'],
-  privacyBody:['Организатор — IT Park University. Собираются имя, телефон, класс, школа (по желанию), согласие и результат для проведения квиза и вручения призов. Сообщения о поступлении — только при отдельной отметке. Цели, срок хранения и обработка должны быть утверждены ITPU до запуска. Несовершеннолетним необходимо письменное согласие родителя.','Tashkilotchi — IT Park University. Ism, telefon, sinf, maktab (ixtiyoriy), rozilik va natija kviz hamda sovrinlar uchun olinadi. Qabul haqidagi xabarlar faqat alohida rozilik bilan yuboriladi. Saqlash shartlari ITPU tomonidan tasdiqlanishi kerak. Voyaga yetmaganlar uchun ota-onaning yozma roziligi zarur.','Organizer: IT Park University. Name, phone, grade, optional school, consent and score are used to run the quiz and award prizes. Admissions updates require a separate opt-in. ITPU must approve purposes and retention before launch. Written parent consent is required for minors.'],
+  privacyBody:['Организатор — IT Park University. Собираются имя, телефон, класс, школа (по желанию), согласие и результат для проведения квиза и вручения призов. Сообщения о поступлении — только при отдельной отметке. Несовершеннолетним необходимо письменное согласие родителя.','Tashkilotchi — IT Park University. Ism, telefon, sinf, maktab (ixtiyoriy), rozilik va natija kviz hamda sovrinlar uchun olinadi. Qabul haqidagi xabarlar faqat alohida rozilik bilan yuboriladi. Voyaga yetmaganlar uchun ota-onaning yozma roziligi zarur.','Organizer: IT Park University. Name, phone, grade, optional school, consent and score are used to run the quiz and award prizes. Admissions updates require a separate opt-in. Written parent consent is required for minors.'],
   privacyOfficial:['Официальная политика ITPU','ITPU rasmiy siyosati','Official ITPU policy'],close:['Закрыть','Yopish','Close'],
   demo:['DEMO · контакты не отправляются','DEMO · ma’lumot yuborilmaydi','DEMO · no contacts are sent']
 };
