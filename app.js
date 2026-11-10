@@ -87,7 +87,7 @@
   function formMarkup(){
     if(!DEMO && !C.consentApproved)return `<section class="registration-paused" aria-labelledby="paused-title"><div class="paused-mark" aria-hidden="true"></div><h1 id="paused-title">${E(T('registrationPausedTitle'))}</h1><p>${E(T('registrationPausedBody'))}</p></section>`;
     return `<section class="form-shell" aria-labelledby="form-heading">
-    <aside class="form-aside"><div class="eyebrow">${E(T('regKicker'))}</div><div class="form-aside-num" aria-hidden="true">01</div><div><h2>${E(T('regTitle'))}</h2><p>${E(T('regDesc'))}</p></div></aside>
+    <aside class="form-aside"><div class="form-aside-num" aria-hidden="true">10</div><p>${E(T('regDesc'))}</p></aside>
     <div class="form-panel"><p class="form-kicker">ITPU / AI CHALLENGE</p><h1 id="form-heading">${E(T('regTitle'))}</h1><p class="form-desc">${E(T('regDesc'))}</p>
       <form id="lead-form" novalidate><div class="form-grid">
         <label class="field full"><span>${E(T('name'))} *</span><input name="fullname" maxlength="90" autocomplete="name" required placeholder="${E(T('namePlaceholder'))}"></label>
@@ -126,9 +126,9 @@
   function resultMarkup(){
     const r=st.result,s=r.score,eligible=s>=C.prizeAt&&!st.session.guest;
     const guestOrDemo=DEMO||st.session.guest;
-    return `<section class="results" aria-labelledby="result-title"><div class="result-main"><div class="eyebrow">${E(T('resultKicker'))}</div><h1 id="result-title">${E(T('resultTitle'))}</h1><div class="score"><strong>${s}</strong><span>${E(T('outOf'))}</span></div><span class="result-badge">${['AI ROOKIE','AI EXPLORER','AI THINKER','AI VISIONARY','AI PIONEER'][tier(s)]}</span><p>${E(T('tier'+tier(s)))}</p>
+    return `<section class="results" aria-labelledby="result-title"><div class="result-main"><div class="eyebrow">${E(T('resultKicker'))}</div><h1 id="result-title">${E(T('resultTitle'))}</h1><div class="score"><strong>${s}</strong><span>${E(T('outOf'))}</span></div><p>${E(T('tier'+tier(s)))}</p>
       <div class="result-tools"><button class="secondary-button" type="button" data-action="share">${E(T('share'))}</button>${DEMO?`<button class="secondary-button" type="button" data-action="replay">${E(T('replay'))}</button>`:''}</div></div>
-      <div class="result-card"><span class="micro">ITPU / NEXT LEVEL</span><h2>${E(eligible?T('eligible'):T('ctaTitle'))}</h2><p>${E(guestOrDemo?T('demoPrize'):(eligible?T('prizeInstructions'):T('noPrize')))}</p>
+      <div class="result-card"><h2>${E(eligible?T('eligible'):T('ctaTitle'))}</h2><p>${E(guestOrDemo?T('demoPrize'):(eligible?T('prizeInstructions'):T('noPrize')))}</p>
         ${eligible?`<div class="claim"><small>${E(T('code'))}</small><strong>${E(r.claimCode||'ITPU-******')}</strong></div>`:''}
         <a class="main-button" href="${E(C.admissions[LANGS[st.language]])}" target="_blank" rel="noopener noreferrer"><span>${E(T('cta'))}</span><span class="button-arrow" aria-hidden="true"></span></a>
       </div><div class="recap"><button class="recap-toggle" type="button" data-action="recap" aria-expanded="${st.recap}">${E(st.recap?T('recapClose'):T('recapOpen'))}<span aria-hidden="true">+</span></button><div class="recap-list" id="recap-list" ${st.recap?'':'hidden'}>${st.recap?recapMarkup():''}</div></div>
@@ -276,7 +276,7 @@
       const light=document.body.dataset.stage==='form'||document.body.dataset.stage==='quiz';
       for(let i=0;i<5;i++){const base=h*(.24+i*.15),drift=Math.sin(t*.00018+i*.6)*h*.035;ctx.beginPath();ctx.moveTo(-40,base);ctx.bezierCurveTo(w*.32,base-h*.12+drift,w*.63,base+h*.1-drift,w+40,base-h*.02);ctx.strokeStyle=light?'rgba(22,104,170,.14)':'rgba(105,194,249,.12)';ctx.lineWidth=1;ctx.stroke();}
     };
-    const sync=()=>{cancelAnimationFrame(frame);if(!document.hidden&&!reduced.matches)frame=requestAnimationFrame(draw);else ctx.clearRect(0,0,w,h);};
+    const sync=()=>{document.body.classList?.toggle('motion-paused',!!document.hidden);cancelAnimationFrame(frame);if(!document.hidden&&!reduced.matches)frame=requestAnimationFrame(draw);else ctx.clearRect(0,0,w,h);};
     document.addEventListener('visibilitychange',sync);reduced.addEventListener?.('change',sync);sync();
   }
   root.addEventListener('click',event=>{

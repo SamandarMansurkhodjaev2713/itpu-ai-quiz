@@ -209,3 +209,7 @@ body{background:#061421;color:#f7fbff}
 .signal path{stroke-dasharray:none;opacity:.35;animation:signal-breathe 5s ease-in-out infinite alternate;animation-delay:calc(var(--line) * -.13s)}
 @keyframes signal-breathe{from{opacity:.18}to{opacity:.72}}
 @media(prefers-reduced-motion:reduce){.signal path{animation:none;opacity:.3}}
+.form-aside{justify-content:flex-end;gap:28px}.form-aside-num{font-size:clamp(135px,15vw,230px);line-height:.85}.form-aside p{font-size:14px;line-height:1.7}
+.result-main .score{margin-bottom:25px}
+body.motion-paused .signal path,body.motion-paused .atmosphere__aura{animation-play-state:paused}
+@media(max-width:850px){.form-aside{display:none}}
