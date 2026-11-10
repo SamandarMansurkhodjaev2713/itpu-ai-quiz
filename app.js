@@ -169,7 +169,7 @@
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
   }
   function guest(){st.session={id:randomId(),guest:true};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');}
-  function startQuiz(){if(!st.session||transitioning)return;st.answers=[];st.orders={};st.index=0;st.deadlineEpoch=0;st.locked=false;if(DEMO)transition('quiz',()=>timer(true));else {st.pending={action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}}
+  function startQuiz(){if(!st.session||st.processing)return;if(transitioning){setTimeout(startQuiz,500);return;}st.answers=[];st.orders={};st.index=0;st.deadlineEpoch=0;st.locked=false;if(DEMO)transition('quiz',()=>timer(true));else {st.pending={action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}}
   function timer(newQuestion){
     cancelAnimationFrame(frame);
     if(st.stage!=='quiz'||st.locked)return;
