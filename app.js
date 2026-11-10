@@ -1,7 +1,9 @@
 (() => {
   'use strict';
   const C = window.ITPU_CONFIG;
-  const Q = window.ITPU_QUESTIONS;
+  const CURRENT_Q=window.ITPU_QUESTIONS,LEGACY_Q=window.ITPU_LEGACY_QUESTIONS;
+  const QUESTION_VERSION='ai-advanced-20261111';
+  let Q=CURRENT_Q;
   const WORDS = window.ITPU_COPY;
   const DEMO = C.mode === 'demo';
   const LANGS = ['ru','uz','en'];
@@ -11,7 +13,7 @@
   const toast = document.getElementById('toast');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const STORAGE = 'itpu-ai-quiz-progress-v4';
-  const st = {language:0,stage:'intro',session:null,index:0,answers:[],orders:{},deadlineEpoch:0,locked:false,result:null,recap:false,processing:false,pending:null};
+  const st = {language:0,stage:'intro',session:null,index:0,answers:[],orders:{},deadlineEpoch:0,locked:false,result:null,recap:false,processing:false,pending:null,questionVersion:QUESTION_VERSION};
   let frame=0,timeout=0,transitioning=false,queuedTransition=null,toastTimeout=0;
 
   const L = value => Array.isArray(value) ? value[st.language] : value;
@@ -24,7 +26,7 @@
   function save(){
     try{
       if(!st.session){sessionStorage.removeItem(STORAGE);return;}
-      sessionStorage.setItem(STORAGE,JSON.stringify({at:Date.now(),stage:st.stage,session:st.session,index:st.index,answers:st.answers,orders:st.orders,deadlineEpoch:st.deadlineEpoch,result:st.result,pending:st.pending}));
+      sessionStorage.setItem(STORAGE,JSON.stringify({at:Date.now(),stage:st.stage,session:st.session,index:st.index,answers:st.answers,orders:st.orders,deadlineEpoch:st.deadlineEpoch,result:st.result,pending:st.pending,questionVersion:st.questionVersion}));
     }catch(_){}
   }
   function restore(){
@@ -32,6 +34,7 @@
       const d=JSON.parse(sessionStorage.getItem(STORAGE)||'null');
       if(!d||!d.session||Date.now()-d.at>2*60*60*1000)return;
       if(!['ready','quiz','wait','result','error'].includes(d.stage))return;
+      if(d.questionVersion!==QUESTION_VERSION){if(!Array.isArray(LEGACY_Q)||LEGACY_Q.length!==10)return;Q=LEGACY_Q;st.questionVersion='legacy';}
       st.session=d.session;st.index=Math.min(9,Math.max(0,d.index|0));st.answers=Array.isArray(d.answers)?d.answers:[];
       st.orders=d.orders||{};st.deadlineEpoch=Number(d.deadlineEpoch)||0;st.result=d.result||null;st.pending=d.pending||null;
       st.stage=d.stage==='wait'?'error':d.stage;
@@ -175,7 +178,7 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-ADV-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
       st.session={id,guest:false};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
@@ -279,7 +282,7 @@
     throw new Error('No confirmation');
   }
   async function share(){const message=`ITPU AI Quiz — ${st.result.score}/10\n${location.href.split('?')[0]}`;if(navigator.share){try{await navigator.share({title:'ITPU AI Quiz',text:message});return;}catch(e){if(e.name==='AbortError')return;}}try{await navigator.clipboard.writeText(message);toastMessage(T('copied'));}catch(_){toastMessage(message);}}
-  function replay(){st.session=null;st.answers=[];st.orders={};st.index=0;st.result=null;st.recap=false;save();transition('intro');}
+  function replay(){st.session=null;st.answers=[];st.orders={};st.index=0;st.result=null;st.recap=false;st.questionVersion=QUESTION_VERSION;Q=CURRENT_Q;save();transition('intro');}
   function ambient(){
     const canvas=document.getElementById('ambient-canvas'),ctx=canvas?.getContext('2d');if(!ctx)return;
     let w=0,h=0,paintTimer=0;
