@@ -81,7 +81,7 @@
       <h1 id="hero-title"><span>${E(T('heroA'))}</span><span>${E(T('heroB'))}</span></h1>
       <p class="hero-lead">${E(T('heroText'))}</p><div class="hero-actions">${btn(T('start'),'intro-start')}<button class="contact-link" type="button" data-action="contact-open">${E(T('contactOpen'))}<span aria-hidden="true">↗</span></button></div>
       <p class="hero-note">${E(T('introHint'))}</p>
-      <div class="hero-stats"><div class="stat"><strong>10</strong><span>${E(T('questions'))}</span></div><div class="stat"><strong>10s</strong><span>${E(T('seconds'))}</span></div><div class="stat"><strong>8/10</strong><span>${E(T('prize'))}</span></div></div>
+      <div class="hero-stats"><div class="stat"><strong>10</strong><span>${E(T('questions'))}</span></div><div class="stat"><strong>${C.seconds}s</strong><span>${E(T('seconds'))}</span></div><div class="stat"><strong>8/10</strong><span>${E(T('prize'))}</span></div></div>
     </div><div class="hero-visual" aria-hidden="true"><svg class="signal" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="signal-gradient" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#1889df" stop-opacity="0"/><stop offset=".35" stop-color="#66c6ff"/><stop offset=".7" stop-color="#d0eeff"/><stop offset="1" stop-color="#1889df" stop-opacity="0"/></linearGradient></defs>${Array.from({length:17},(_,i)=>{const y=36+i*20, d=`M -20 ${y} C 110 ${y} 155 ${340-i*14} 300 ${200+i*1.3} S 485 ${y+20} 620 ${y-10}`;return `<path class="signal-base" d="${d}"/><path class="signal-trace" style="--line:${i}" pathLength="100" d="${d}"/>`;}).join('')}</svg></div>
   </section>`;}
   function formMarkup(){
@@ -93,7 +93,7 @@
         <label class="field name-field"><span>${E(T('firstName'))} *</span><input name="firstName" maxlength="44" autocomplete="given-name" required></label>
         <label class="field name-field"><span>${E(T('lastName'))} *</span><input name="lastName" maxlength="44" autocomplete="family-name" required></label>
         <label class="field phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" maxlength="22" autocomplete="tel" placeholder="+998 90 123 45 67" required></label>
-        <label class="field"><span>${E(T('grade'))} *</span><select name="grade" required><option value="">${E(T('gradeChoose'))}</option><option value="10">${E(T('grade10'))}</option><option value="11">${E(T('grade11'))}</option><option value="other">${E(T('gradeOther'))}</option></select></label>
+        <fieldset class="field age-field grade-field"><legend>${E(T('grade'))} *</legend><div class="age-options grade-options"><label><input type="radio" name="grade" value="10" required><span>${E(T('grade10'))}</span></label><label><input type="radio" name="grade" value="11"><span>${E(T('grade11'))}</span></label><label><input type="radio" name="grade" value="other"><span>${E(T('gradeOther'))}</span></label></div></fieldset>
         <label class="field"><span>${E(T('school'))} <small>(${E(T('optional'))})</small></span><input name="school" maxlength="100" placeholder="${E(T('schoolPlaceholder'))}"></label>
         <fieldset class="field age-field"><legend>${E(T('age'))} *</legend><div class="age-options"><label><input type="radio" name="age" value="minor" required><span>${E(T('minor'))}</span></label><label><input type="radio" name="age" value="adult"><span>${E(T('adult'))}</span></label></div></fieldset>
       </div><div class="notice" id="minor-notice" hidden>${E(T('minorButtonNotice'))}</div>
@@ -103,7 +103,7 @@
   </section>`;}
   function contactMarkup(){return `<section class="contact-shell" aria-labelledby="contact-heading"><button class="back-link" type="button" data-action="contact-back">← ${E(T('back'))}</button><div class="contact-content"><h1 id="contact-heading">${E(T('contactTitle'))}</h1><p>${E(T('contactDesc'))}</p><form id="contact-form" novalidate><label class="field contact-phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="22" placeholder="+998 90 123 45 67" required></label><fieldset class="field contact-role"><legend>${E(T('contactRole'))} *</legend><div class="age-options"><label><input type="radio" name="role" value="applicant" required><span>${E(T('roleApplicant'))}</span></label><label><input type="radio" name="role" value="student"><span>${E(T('roleStudent'))}</span></label><label><input type="radio" name="role" value="parent"><span>${E(T('roleParent'))}</span></label></div></fieldset><p class="contact-consent">${E(T('contactConsent'))} <a href="${E(C.privacyUrl)}" target="_blank" rel="noopener noreferrer">${E(T('privacyOfficial'))}</a></p><p class="reg-error" id="contact-error" role="alert" hidden></p><button type="submit" id="contact-submit" class="main-button"><span>${E(T('contactSubmit'))}</span><span class="button-arrow" aria-hidden="true"></span></button></form></div></section>`;}
   function contactDone(){return `<section class="contact-shell contact-done"><div class="contact-content"><h1>${E(T('contactDone'))}</h1><p>${E(T('contactDoneText'))}</p><button class="secondary-button" type="button" data-action="contact-back">${E(T('backHome'))}</button></div></section>`;}
-  function ready(){return `<section class="ready ready-new" aria-labelledby="ready-heading"><div class="ready-kicker">ITPU AI QUIZ</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p><div class="ready-facts"><span><b>10</b>${E(T('questions'))}</span><span><b>10s</b>${E(T('seconds'))}</span><span><b>8/10</b>${E(T('prize'))}</span></div>${btn(T('readyGo'),'quiz-start')}</section>`;}
+  function ready(){return `<section class="ready ready-new" aria-labelledby="ready-heading"><div class="ready-kicker">ITPU AI QUIZ</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p><div class="ready-facts"><span><b>10</b>${E(T('questions'))}</span><span><b>${C.seconds}s</b>${E(T('seconds'))}</span><span><b>8/10</b>${E(T('prize'))}</span></div>${btn(T('readyGo'),'quiz-start')}</section>`;}
   function orderFor(q){
     if(st.orders[q.id]?.length===5)return st.orders[q.id];
     const arr=[0,1,2,3,4];for(let i=4;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]];}
@@ -115,7 +115,7 @@
       <div class="quiz-head"><div class="quiz-index">${E(T('question'))} <b>${String(st.index+1).padStart(2,'0')}</b> / 10</div><small>ITPU AI EXPERIENCE</small></div>
       <div class="progress" role="progressbar" aria-valuenow="${st.index+1}" aria-valuemin="1" aria-valuemax="10"><span style="width:${st.index*10}%"></span></div>
       <div class="quiz-grid"><div class="question-side"><div><div class="question-tag">${E(L(q.tag))}</div><h1 id="question-title">${E(L(q.q))}</h1></div>
-        <div class="timer-block"><div class="timer" role="timer" aria-label="${E(T('left'))}"><svg viewBox="0 0 110 110" aria-hidden="true"><circle class="timer-track" cx="55" cy="55" r="48"/><circle id="timer-progress" class="timer-progress" cx="55" cy="55" r="48" stroke-dasharray="301.593" stroke-dashoffset="0"/></svg><strong id="time-count">10</strong></div><div class="timer-label"><span>${E(T('left'))}</span><b id="quiz-hint">${E(T('choose'))}</b></div></div>
+        <div class="timer-block"><div class="timer" role="timer" aria-label="${E(T('left'))}"><svg viewBox="0 0 110 110" aria-hidden="true"><circle class="timer-track" cx="55" cy="55" r="48"/><circle id="timer-progress" class="timer-progress" cx="55" cy="55" r="48" stroke-dasharray="301.593" stroke-dashoffset="0"/></svg><strong id="time-count">${C.seconds}</strong></div><div class="timer-label"><span>${E(T('left'))}</span><b id="quiz-hint">${E(T('choose'))}</b></div></div>
       </div><div class="answers" role="group" aria-label="${E(T('choose'))}">${order.map((answerIndex,i)=>`<button class="answer" type="button" data-action="answer" data-answer="${answerIndex}"><span class="answer-key" aria-hidden="true">${'ABCDE'[i]}</span><span class="answer-text">${E(L(q.a[answerIndex]))}</span><span class="answer-arrow" aria-hidden="true"></span></button>`).join('')}</div></div>
       <div class="quiz-foot"><span>ITPU / THINK FORWARD</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     </section>`;
@@ -175,7 +175,7 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
       st.session={id,guest:false};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
@@ -219,7 +219,7 @@
         st.pending=null;st.locked=false;st.answers=result.answers;st.result={score:result.score,correct:result.correct,claimCode:result.claimCode||''};st.recap=false;st.deadlineEpoch=0;transition('result');
       }else{
         if(result.status!=='playing'||!Number.isInteger(result.index)||result.index<0||result.index>9)throw new Error('Invalid progress');
-        st.pending=null;st.locked=false;st.index=result.index;st.deadlineEpoch=Date.now()+Math.max(0,Math.min(10000,Number(result.remainingMs)||0));enterStage('quiz');timer(false);
+        st.pending=null;st.locked=false;st.index=result.index;st.deadlineEpoch=Date.now()+Math.max(0,Math.min(C.seconds*1000,Number(result.remainingMs)||0));enterStage('quiz');timer(false);
       }
     }catch(err){enterStage('error');}finally{st.processing=false;}
   }
