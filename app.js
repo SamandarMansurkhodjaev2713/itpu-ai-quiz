@@ -140,6 +140,7 @@
     return `<article class="recap-item"><small>${E(T('question'))} ${String(i+1).padStart(2,'0')}</small><h3>${E(L(q.q))}</h3>${ok?'':(wrong||`<div class="wrong">${E(T('skipped'))}</div>`)}<div>${E(T('correct'))}: ${E(L(q.a[correct]))}</div>${q.why?`<p>${E(L(q.why))}</p>`:''}</article>`;
   }).join('');}
   function render(){
+    document.body.dataset.stage=st.stage;
     root.classList.remove('enter');void root.offsetWidth;root.classList.add('enter');
     switch(st.stage){case 'intro':root.innerHTML=intro();break;case 'form':root.innerHTML=formMarkup();break;case 'ready':root.innerHTML=ready();break;case 'quiz':root.innerHTML=quizMarkup();break;case 'wait':root.innerHTML=waitMarkup();break;case 'error':root.innerHTML=errorMarkup();break;case 'result':root.innerHTML=resultMarkup();break;default:root.innerHTML=intro();}
     save();

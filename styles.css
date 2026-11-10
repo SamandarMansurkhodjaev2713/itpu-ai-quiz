@@ -245,3 +245,54 @@ body.motion-paused .signal path,body.motion-paused .atmosphere__aura{animation-p
 @media(max-width:350px){.hero-visual{aspect-ratio:2.5}.hero h1{font-size:clamp(38px,11vw,42px)}.hero-lead{font-size:15px}.stat strong{font-size:26px}}
 @media(prefers-reduced-motion:reduce){.signal .signal-trace{animation:none;stroke-dasharray:none;opacity:.2}.answer:hover:not(:disabled){transform:none}}
 body.motion-paused .signal-trace{animation-play-state:paused}
+
+/* Event edition: readable first, with a continuous ITPU signal. */
+::selection{background:#80ccfa;color:#061b2d}
+.hero{gap:clamp(38px,5vw,88px)}
+.hero-copy{position:relative}
+.hero h1{max-width:10ch;text-wrap:balance}
+.hero-lead{max-width:42ch}
+.hero-visual{overflow:visible}
+.hero-visual:before{inset:15% 3%;background:radial-gradient(ellipse,#227eb03d,transparent 68%);animation:signal-halo 9s ease-in-out infinite alternate}
+.signal .signal-base{opacity:.4}
+.signal .signal-trace{stroke-width:2.1;animation-duration:8s}
+@keyframes signal-halo{from{transform:scale(.92);opacity:.55}to{transform:scale(1.06);opacity:1}}
+.hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.stat{min-width:0;align-items:baseline}
+.stat span{line-height:1.3}
+.main-button:focus-visible,.secondary-button:focus-visible,.language button:focus-visible,.recap-toggle:focus-visible{outline:3px solid #83d2ff;outline-offset:4px}
+.quiz-shell{padding-block:18px}
+.question-side h1{text-wrap:balance;overflow-wrap:normal}
+.answer{line-height:1.38;min-height:70px}
+.answer-key{font-variant-numeric:tabular-nums}
+.screen.enter .answer{animation:answer-arrive .38s var(--ease) both}
+.screen.enter .answer:nth-child(2){animation-delay:.035s}
+.screen.enter .answer:nth-child(3){animation-delay:.07s}
+.screen.enter .answer:nth-child(4){animation-delay:.105s}
+.screen.enter .answer:nth-child(5){animation-delay:.14s}
+@keyframes answer-arrive{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:none}}
+.answer.selected{animation:none!important}
+.progress span{transition:width .45s var(--ease)}
+.recap-item h3{text-wrap:balance}
+@media(max-width:850px){
+ .hero-copy{order:0;padding-top:24px}
+ .hero-visual{order:1;aspect-ratio:2.7;margin-top:12px}
+ .hero h1{max-width:12ch}
+}
+@media(max-width:550px){
+ .site-header{min-height:68px;padding-block:10px}
+ .screen{padding-top:12px}
+ .hero-copy{padding-top:18px}
+ .hero h1{font-size:clamp(37px,10vw,54px);line-height:1.03;overflow-wrap:normal}
+ .hero-lead{font-size:16px;line-height:1.52}
+ .hero-stats{gap:8px;margin-top:25px}
+ .stat strong{font-size:clamp(25px,7vw,30px)}
+ .stat span{font-size:12px;line-height:1.25}
+ .hero-visual{aspect-ratio:2.65;margin-top:14px}
+ .question-side h1{font-size:clamp(24px,6.3vw,31px);line-height:1.18}
+ .answer{min-height:56px;font-size:15px;line-height:1.3}
+ .quiz-foot{margin-top:18px}
+}
+@media(max-width:350px){.hero h1{font-size:clamp(35px,10.7vw,38px)}.hero-lead{font-size:15px}.stat span{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.hero-visual:before,.screen.enter .answer{animation:none!important}.hero-visual:before{opacity:.7}}
+body.motion-paused .hero-visual:before{animation-play-state:paused}
