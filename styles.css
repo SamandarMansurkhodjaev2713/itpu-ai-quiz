@@ -297,3 +297,25 @@ body.motion-paused .signal-trace{animation-play-state:paused}
 @media(max-width:350px){.hero h1{font-size:clamp(35px,10.7vw,38px)}.hero-lead{font-size:15px}.stat span{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.hero-visual:before,.screen.enter .answer{animation:none!important}.hero-visual:before{opacity:.7}}
 body.motion-paused .hero-visual:before{animation-play-state:paused}
+
+/* Registration choices stay visible and easy to use on touch screens. */
+.age-field{grid-column:1/-1;border:0;padding:0;margin:0;min-width:0}
+.age-field legend{padding:0;margin-bottom:9px;color:#32475b;font-size:14px;font-weight:740}
+.age-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.age-options label{position:relative;min-width:0;cursor:pointer}
+.age-options input{position:absolute;width:1px;height:1px;opacity:0;margin:0}
+.age-options span{display:flex;align-items:center;justify-content:center;min-height:52px;padding:10px 12px;border:1px solid #cadae6;border-radius:8px;background:#fff;color:#28475f;text-align:center;font-size:15px;font-weight:650;line-height:1.25;transition:background .22s var(--ease),border-color .22s,color .22s,transform .18s var(--ease)}
+.age-options label:hover span{border-color:#6baee0;background:#f0f8fe}
+.age-options input:checked+span{border-color:#147fca;background:#e6f5ff;color:#07568e}
+.age-options input:focus-visible+span{outline:3px solid #2d9ce8;outline-offset:3px}
+.age-options label:active span{transform:scale(.98)}
+.consent-note{margin-top:22px;padding-top:18px;border-top:1px solid #d9e5ee}
+.consent-note p{margin:0 0 6px;color:#405e73;font-size:13px;line-height:1.55}
+.consent-note .text-link{min-height:38px;text-align:left}
+.form-panel{animation:form-arrive .55s var(--ease) both}
+@keyframes form-arrive{from{opacity:.7;transform:translateY(10px)}to{opacity:1;transform:none}}
+.form-aside:after{content:'';position:absolute;inset:auto -35% -60% 2%;height:85%;border:1px solid #75c7f53b;border-radius:50%;transform:rotate(-18deg);animation:form-signal 9s ease-in-out infinite alternate;pointer-events:none}
+@keyframes form-signal{from{transform:rotate(-18deg) translateY(0)}to{transform:rotate(-12deg) translateY(-18px)}}
+@media(max-width:550px){.age-field legend{font-size:13px}.age-options span{min-height:52px;font-size:14px}.consent-note p{font-size:13px}}
+@media(max-width:350px){.age-options span{font-size:13px;padding-inline:6px}}
+@media(prefers-reduced-motion:reduce){.form-panel,.form-aside:after{animation:none}.age-options span{transition:none}}

@@ -43,7 +43,7 @@
   function setLanguage(lang){
     if(!LANGS.includes(lang))return;
     const oldForm=document.getElementById('lead-form');
-    const values=oldForm?Array.from(oldForm.elements).filter(el=>el.name).map(el=>({name:el.name,value:el.value,checked:el.checked})):[];
+    const values=oldForm?Array.from(oldForm.elements).filter(el=>el.name&&(el.type!=='radio'||el.checked)).map(el=>({name:el.name,value:el.value})):[];
     st.language=LANGS.indexOf(lang);
     document.documentElement.lang=lang;
     document.getElementById('brand-caption').textContent=T('brand');
@@ -56,7 +56,7 @@
     if(DEMO){const ribbon=document.getElementById('demo-ribbon');if(ribbon)ribbon.textContent=T('demo');}
     if(st.stage==='quiz'){cancelAnimationFrame(frame);render();timer(false);}else render();
     const newForm=document.getElementById('lead-form');
-    if(newForm){values.forEach(item=>{const el=newForm.elements.namedItem(item.name);if(el){el.value=item.value;el.checked=item.checked;}});const minor=newForm.elements.age.value==='minor';document.getElementById('guardian-row').hidden=!minor;document.getElementById('minor-notice').hidden=!minor;}
+    if(newForm){values.forEach(item=>{const el=newForm.elements.namedItem(item.name);if(el)el.value=item.value;});const minor=newForm.elements.age.value==='minor';document.getElementById('minor-notice').hidden=!minor;}
     try{localStorage.setItem('itpu-ai-quiz-lang',lang);}catch(_){}
   }
   function initialLanguage(){
@@ -95,12 +95,9 @@
         <label class="field phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" maxlength="22" autocomplete="tel" placeholder="+998 90 123 45 67" required></label>
         <label class="field"><span>${E(T('grade'))} *</span><select name="grade" required><option value="">${E(T('gradeChoose'))}</option><option value="10">${E(T('grade10'))}</option><option value="11">${E(T('grade11'))}</option><option value="other">${E(T('gradeOther'))}</option></select></label>
         <label class="field"><span>${E(T('school'))} <small>(${E(T('optional'))})</small></span><input name="school" maxlength="100" placeholder="${E(T('schoolPlaceholder'))}"></label>
-        <label class="field"><span>${E(T('age'))} *</span><select name="age" required><option value="">${E(T('ageChoose'))}</option><option value="minor">${E(T('minor'))}</option><option value="adult">${E(T('adult'))}</option></select></label>
-      </div><div class="notice" id="minor-notice" hidden>${E(T('minorNotice'))}</div>
-      <label class="check" id="guardian-row" hidden><input name="guardian" type="checkbox"><span>${E(T('guardian'))}</span></label>
-      <label class="check"><input name="consent" type="checkbox" required><span>${E(T('consent'))}</span></label>
-      <label class="check"><input name="marketing" type="checkbox"><span>${E(T('marketing'))}</span></label>
-      <div style="margin-top:8px"><button type="button" class="text-link" data-action="privacy">${E(T('privacy'))}</button></div>
+        <fieldset class="field age-field"><legend>${E(T('age'))} *</legend><div class="age-options"><label><input type="radio" name="age" value="minor" required><span>${E(T('minor'))}</span></label><label><input type="radio" name="age" value="adult"><span>${E(T('adult'))}</span></label></div></fieldset>
+      </div><div class="notice" id="minor-notice" hidden>${E(T('minorButtonNotice'))}</div>
+      <div class="consent-note"><p>${E(T('consentButtonNotice'))}</p><button type="button" class="text-link" data-action="privacy">${E(T('privacy'))}</button></div>
       <div class="reg-actions"><p id="reg-error" class="reg-error" role="alert" hidden></p><button type="submit" id="reg-submit" class="main-button"><span>${E(T('register'))}</span><span class="button-arrow" aria-hidden="true"></span></button></div>
       </form></div>
   </section>`;}
@@ -151,12 +148,10 @@
   async function register(form){
     if(st.processing)return;
     const firstName=form.elements.firstName.value.trim().replace(/\s+/g,' '),lastName=form.elements.lastName.value.trim().replace(/\s+/g,' '),name=`${firstName} ${lastName}`,phone=phoneNumber(form.elements.phone.value),grade=form.elements.grade.value,school=form.elements.school.value.trim(),age=form.elements.age.value;
-    const consent=!!form.elements.consent.checked,guardian=!!form.elements.guardian.checked,marketing=!!form.elements.marketing.checked;
+    const consent=true,guardian=age==='minor',marketing=false;
     if(!firstName||!lastName)return formError(T('errName'));
     if(!phone)return formError(T('errPhone'));
     if(!grade||!age)return formError(T('ageChoose'));
-    if(age==='minor'&&!guardian)return formError(T('errGuardian'));
-    if(!consent)return formError(T('errConsent'));
     if(!DEMO&&(!C.consentApproved||!C.endpoint))return formError(T('regUnavailable'));
     const button=document.getElementById('reg-submit');button.disabled=true;button.firstElementChild.textContent=T('sending');st.processing=true;
     // Reuse the same ID after a network failure. A successful POST might have
@@ -167,7 +162,7 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
       st.session={id,guest:false};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
@@ -295,7 +290,7 @@
     }
   });
   root.addEventListener('submit',event=>{if(event.target.id!=='lead-form')return;event.preventDefault();register(event.target);});
-  root.addEventListener('change',event=>{if(event.target.name==='age'){const minor=event.target.value==='minor';document.getElementById('guardian-row').hidden=!minor;document.getElementById('minor-notice').hidden=!minor;}});
+  root.addEventListener('change',event=>{if(event.target.name==='age'){document.getElementById('minor-notice').hidden=event.target.value!=='minor';}});
   document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
   document.getElementById('privacy-close').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
