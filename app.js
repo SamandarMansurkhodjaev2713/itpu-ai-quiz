@@ -85,7 +85,7 @@
       <p class="hero-lead">${E(T('heroText'))}</p><div class="hero-actions">${btn(T('start'),'intro-start')}<button class="contact-link" type="button" data-action="contact-open">${E(T('contactOpen'))}<span aria-hidden="true">↗</span></button></div>
       <p class="hero-note">${E(T('introHint'))}</p>
       <div class="hero-stats"><div class="stat"><strong>10</strong><span>${E(T('questions'))}</span></div><div class="stat"><strong>${C.seconds}s</strong><span>${E(T('seconds'))}</span></div><div class="stat"><strong>8/10</strong><span>${E(T('prize'))}</span></div></div>
-    </div><div class="hero-visual" aria-hidden="true"><svg class="signal" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="signal-gradient" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#1889df" stop-opacity="0"/><stop offset=".35" stop-color="#66c6ff"/><stop offset=".7" stop-color="#d0eeff"/><stop offset="1" stop-color="#1889df" stop-opacity="0"/></linearGradient></defs>${Array.from({length:17},(_,i)=>{const y=36+i*20, d=`M -20 ${y} C 110 ${y} 155 ${340-i*14} 300 ${200+i*1.3} S 485 ${y+20} 620 ${y-10}`;return `<path class="signal-base" d="${d}"/><path class="signal-trace" style="--line:${i}" pathLength="100" d="${d}"/>`;}).join('')}</svg></div>
+    </div><div class="hero-visual" aria-hidden="true"><svg class="signal" viewBox="0 0 600 400" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="signal-gradient" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#1889df" stop-opacity="0"/><stop offset=".35" stop-color="#66c6ff"/><stop offset=".7" stop-color="#d0eeff"/><stop offset="1" stop-color="#1889df" stop-opacity="0"/></linearGradient></defs>${Array.from({length:17},(_,i)=>{const y=36+i*20, d=`M -20 ${y} C 110 ${y} 155 ${340-i*14} 300 ${200+i*1.3} S 485 ${y+20} 620 ${y-10}`;return `<path class="signal-base" d="${d}"/><path class="signal-trace" style="--line:${i}" pathLength="100" d="${d}"/>`;}).join('')}</svg></div>
   </section>`;}
   function formMarkup(){
     if(!DEMO && !C.consentApproved)return `<section class="registration-paused" aria-labelledby="paused-title"><div class="paused-mark" aria-hidden="true"></div><h1 id="paused-title">${E(T('registrationPausedTitle'))}</h1><p>${E(T('registrationPausedBody'))}</p></section>`;
@@ -321,3 +321,4 @@
   if(st.stage==='quiz')timer(false);
   ambient();
 })();
+
