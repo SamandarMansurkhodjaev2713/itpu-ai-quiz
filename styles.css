@@ -213,3 +213,35 @@ body{background:#061421;color:#f7fbff}
 .result-main .score{margin-bottom:25px}
 body.motion-paused .signal path,body.motion-paused .atmosphere__aura{animation-play-state:paused}
 @media(max-width:850px){.form-aside{display:none}}
+/* ITPU / a living signal, with an editorial typographic rhythm. */
+@font-face{font-family:Onest;src:url('assets/onest.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:swap}
+:root{font-family:Onest,Montserrat,sans-serif;--ease:cubic-bezier(.16,1,.3,1)}
+.hero h1,.question-side h1,.form-panel h1,.ready h1,.result-main h1,.result-card h2,.registration-paused h1{font-family:Montserrat,sans-serif}
+.site-header{padding-block:16px}.brand-caption{font-family:Onest,sans-serif;letter-spacing:.09em}
+.language{background:#10283d;border-color:#a9d5ee35}.language button{font-family:Onest,sans-serif;font-size:12px;font-weight:700}
+.hero{gap:clamp(30px,4vw,70px);max-width:1460px}.hero-copy{padding-block:48px}
+.hero h1{font-size:clamp(58px,7.1vw,105px);line-height:1.02;letter-spacing:-.035em;margin-bottom:28px}
+.hero-lead{font-size:clamp(17px,1.35vw,20px);line-height:1.62;color:#d3e4ef;max-width:515px}
+.hero-note{font-size:14px;color:#bad0df}.hero-stats{margin-top:clamp(40px,6vh,65px);max-width:530px}
+.stat strong{font-family:Montserrat,sans-serif;font-size:clamp(30px,3vw,43px);letter-spacing:-.035em}.stat span{font-size:13px;color:#c6d9e5}
+.hero-visual{aspect-ratio:1.18;overflow:hidden;position:relative}
+.hero-visual:before{display:block;content:'';inset:14% 8%;border:0;border-radius:50%;background:radial-gradient(ellipse,#1b78b42b,transparent 68%);transform:none;opacity:.9}
+.hero-visual:after{display:none}.signal{position:relative;width:100%;filter:drop-shadow(0 0 12px #4ec0ff45)}
+.signal .signal-base{stroke:url(#signal-gradient);stroke-width:1;stroke-dasharray:none;opacity:.30;animation:none}
+.signal .signal-trace{stroke:url(#signal-gradient);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:12 88;opacity:.85;animation:trace-run 6.8s linear infinite;animation-delay:calc(var(--line) * -.13s)}
+@keyframes trace-run{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+.main-button{font-family:Onest,sans-serif;font-size:15px;font-weight:700;min-height:62px;gap:28px}
+.main-button:active{transform:scale(.965);background:#126eaf}.button-arrow{transition:transform .28s var(--ease),background .28s}.main-button:hover .button-arrow{transform:translateX(4px);background:#ffffff3b}
+.form-shell{border:0;box-shadow:0 28px 80px #143a5917}.form-panel{padding:clamp(28px,4.4vw,64px)}
+.form-panel h1{line-height:1.1;margin-bottom:16px}.form-desc{font-size:16px;line-height:1.6}.field>span{font-size:14px}
+.field input,.field select{border-color:#cadae6;border-radius:8px;transition:border-color .2s,box-shadow .2s,background .2s}.field input:focus,.field select:focus{background:#fff;border-color:#1e89d7;box-shadow:0 0 0 4px #1e89d722}
+.check{font-size:14px;line-height:1.6}.text-link,.reg-error{font-size:14px}.question-side h1{line-height:1.15}.answer{font-family:Onest,sans-serif;font-size:16px;min-height:68px;transition:transform .18s var(--ease),background .18s,border-color .18s,box-shadow .18s}
+.answer:hover:not(:disabled){transform:translateX(5px)}.answer.selected{transform:translateX(4px)}.answer:active:not(:disabled){transform:scale(.985)}
+.quiz-index,.question-tag,.timer-label span,.quiz-foot{font-family:Onest,sans-serif}.timer strong{font-family:Montserrat,sans-serif}
+.result-main p,.result-card p,.recap-item p,.recap-item div{line-height:1.7}.recap-item h3{font-size:16px}.recap-item div,.recap-item p{font-size:14px}
+.wipe{background:#0c3555}.screen.enter>*{animation:screen-arrive .42s var(--ease) both}
+@media(max-width:850px){.hero{display:flex;flex-direction:column;gap:0}.hero-visual{order:-1;aspect-ratio:2.2;width:100%;margin:0;min-height:0}.hero-copy{order:0;padding:4px 0 0}.hero h1{font-size:clamp(45px,9.2vw,74px)}.signal{width:100%;height:100%}.hero-lead{font-size:16px}}
+@media(max-width:550px){.site-header{min-height:68px}.hero-visual{aspect-ratio:2.35}.hero h1{font-size:clamp(40px,10.3vw,58px);line-height:1.02;margin-bottom:18px}.hero-lead{font-size:16px;line-height:1.55;margin-bottom:20px}.hero-note{font-size:13px}.hero-stats{margin-top:24px}.stat strong{font-size:29px}.stat span{font-size:12px}.main-button{min-height:58px;font-size:14px}.form-panel{padding:26px 20px}.field>span{font-size:13px}.field input,.field select{font-size:16px}.question-side h1{font-size:clamp(25px,6.8vw,34px)}.answer{font-size:15px;min-height:56px}.result-card p{font-size:15px}}
+@media(max-width:350px){.hero-visual{aspect-ratio:2.5}.hero h1{font-size:clamp(38px,11vw,42px)}.hero-lead{font-size:15px}.stat strong{font-size:26px}}
+@media(prefers-reduced-motion:reduce){.signal .signal-trace{animation:none;stroke-dasharray:none;opacity:.2}.answer:hover:not(:disabled){transform:none}}
+body.motion-paused .signal-trace{animation-play-state:paused}
