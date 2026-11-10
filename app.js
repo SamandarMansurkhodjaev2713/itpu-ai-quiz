@@ -41,8 +41,8 @@
     }catch(_){}
   }
   function setLanguage(lang){
-    if(!LANGS.includes(lang))return;
-    const oldForm=document.getElementById('lead-form');
+    if(!LANGS.includes(lang)||st.processing)return;
+    const oldForm=document.getElementById('lead-form')||document.getElementById('contact-form');
     const values=oldForm?Array.from(oldForm.elements).filter(el=>el.name&&(el.type!=='radio'||el.checked)).map(el=>({name:el.name,value:el.value})):[];
     st.language=LANGS.indexOf(lang);
     document.documentElement.lang=lang;
@@ -55,8 +55,8 @@
     document.getElementById('privacy-close').setAttribute('aria-label',T('close'));
     if(DEMO){const ribbon=document.getElementById('demo-ribbon');if(ribbon)ribbon.textContent=T('demo');}
     if(st.stage==='quiz'){cancelAnimationFrame(frame);render();timer(false);}else render();
-    const newForm=document.getElementById('lead-form');
-    if(newForm){values.forEach(item=>{const el=newForm.elements.namedItem(item.name);if(el)el.value=item.value;});const minor=newForm.elements.age.value==='minor';document.getElementById('minor-notice').hidden=!minor;}
+    const newForm=document.getElementById('lead-form')||document.getElementById('contact-form');
+    if(newForm){values.forEach(item=>{const el=newForm.elements.namedItem(item.name);if(el)el.value=item.value;});if(newForm.id==='lead-form'){const minor=newForm.elements.age.value==='minor';document.getElementById('minor-notice').hidden=!minor;}}
     try{localStorage.setItem('itpu-ai-quiz-lang',lang);}catch(_){}
   }
   function initialLanguage(){
@@ -73,13 +73,13 @@
     if(transitioning){queuedTransition={stage,after};return;}
     if(reduced.matches){enterStage(stage);after?.();return;}
     transitioning=true;wipe.classList.remove('leave');wipe.classList.add('cover');
-    setTimeout(()=>{enterStage(stage);wipe.classList.remove('cover');wipe.classList.add('leave');setTimeout(()=>{wipe.classList.remove('leave');transitioning=false;after?.();if(queuedTransition){const next=queuedTransition;queuedTransition=null;transition(next.stage,next.after);}},490);},460);
+    setTimeout(()=>{enterStage(stage);wipe.classList.remove('cover');wipe.classList.add('leave');setTimeout(()=>{wipe.classList.remove('leave');transitioning=false;after?.();if(queuedTransition){const next=queuedTransition;queuedTransition=null;transition(next.stage,next.after);}},260);},240);
   }
 
   function intro(){return `<section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy"><div class="eyebrow">${E(T('eyebrow'))}</div>
       <h1 id="hero-title"><span>${E(T('heroA'))}</span><span>${E(T('heroB'))}</span></h1>
-      <p class="hero-lead">${E(T('heroText'))}</p>${btn(T('start'),'intro-start')}
+      <p class="hero-lead">${E(T('heroText'))}</p><div class="hero-actions">${btn(T('start'),'intro-start')}<button class="contact-link" type="button" data-action="contact-open">${E(T('contactOpen'))}<span aria-hidden="true">↗</span></button></div>
       <p class="hero-note">${E(T('introHint'))}</p>
       <div class="hero-stats"><div class="stat"><strong>10</strong><span>${E(T('questions'))}</span></div><div class="stat"><strong>10s</strong><span>${E(T('seconds'))}</span></div><div class="stat"><strong>8/10</strong><span>${E(T('prize'))}</span></div></div>
     </div><div class="hero-visual" aria-hidden="true"><svg class="signal" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="signal-gradient" x1="0" y1="0" x2="600" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#1889df" stop-opacity="0"/><stop offset=".35" stop-color="#66c6ff"/><stop offset=".7" stop-color="#d0eeff"/><stop offset="1" stop-color="#1889df" stop-opacity="0"/></linearGradient></defs>${Array.from({length:17},(_,i)=>{const y=36+i*20, d=`M -20 ${y} C 110 ${y} 155 ${340-i*14} 300 ${200+i*1.3} S 485 ${y+20} 620 ${y-10}`;return `<path class="signal-base" d="${d}"/><path class="signal-trace" style="--line:${i}" pathLength="100" d="${d}"/>`;}).join('')}</svg></div>
@@ -101,7 +101,9 @@
       <div class="reg-actions"><p id="reg-error" class="reg-error" role="alert" hidden></p><button type="submit" id="reg-submit" class="main-button"><span>${E(T('register'))}</span><span class="button-arrow" aria-hidden="true"></span></button></div>
       </form></div>
   </section>`;}
-  function ready(){return `<section class="ready" aria-labelledby="ready-heading"><div class="eyebrow">${E(T('readyKicker'))}</div><div class="ready-number" aria-hidden="true">10</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p>${btn(T('readyGo'),'quiz-start')}</section>`;}
+  function contactMarkup(){return `<section class="contact-shell" aria-labelledby="contact-heading"><button class="back-link" type="button" data-action="contact-back">← ${E(T('back'))}</button><div class="contact-content"><h1 id="contact-heading">${E(T('contactTitle'))}</h1><p>${E(T('contactDesc'))}</p><form id="contact-form" novalidate><label class="field contact-phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="22" placeholder="+998 90 123 45 67" required></label><fieldset class="field contact-role"><legend>${E(T('contactRole'))} *</legend><div class="age-options"><label><input type="radio" name="role" value="applicant" required><span>${E(T('roleApplicant'))}</span></label><label><input type="radio" name="role" value="student"><span>${E(T('roleStudent'))}</span></label><label><input type="radio" name="role" value="parent"><span>${E(T('roleParent'))}</span></label></div></fieldset><p class="contact-consent">${E(T('contactConsent'))} <a href="${E(C.privacyUrl)}" target="_blank" rel="noopener noreferrer">${E(T('privacyOfficial'))}</a></p><p class="reg-error" id="contact-error" role="alert" hidden></p><button type="submit" id="contact-submit" class="main-button"><span>${E(T('contactSubmit'))}</span><span class="button-arrow" aria-hidden="true"></span></button></form></div></section>`;}
+  function contactDone(){return `<section class="contact-shell contact-done"><div class="contact-content"><h1>${E(T('contactDone'))}</h1><p>${E(T('contactDoneText'))}</p><button class="secondary-button" type="button" data-action="contact-back">${E(T('backHome'))}</button></div></section>`;}
+  function ready(){return `<section class="ready ready-new" aria-labelledby="ready-heading"><div class="ready-kicker">ITPU AI QUIZ</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p><div class="ready-facts"><span><b>10</b>${E(T('questions'))}</span><span><b>10s</b>${E(T('seconds'))}</span><span><b>8/10</b>${E(T('prize'))}</span></div>${btn(T('readyGo'),'quiz-start')}</section>`;}
   function orderFor(q){
     if(st.orders[q.id]?.length===5)return st.orders[q.id];
     const arr=[0,1,2,3,4];for(let i=4;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]];}
@@ -140,11 +142,22 @@
   function render(){
     document.body.dataset.stage=st.stage;
     root.classList.remove('enter');void root.offsetWidth;root.classList.add('enter');
-    switch(st.stage){case 'intro':root.innerHTML=intro();break;case 'form':root.innerHTML=formMarkup();break;case 'ready':root.innerHTML=ready();break;case 'quiz':root.innerHTML=quizMarkup();break;case 'wait':root.innerHTML=waitMarkup();break;case 'error':root.innerHTML=errorMarkup();break;case 'result':root.innerHTML=resultMarkup();break;default:root.innerHTML=intro();}
+    switch(st.stage){case 'intro':root.innerHTML=intro();break;case 'form':root.innerHTML=formMarkup();break;case 'contact':root.innerHTML=contactMarkup();break;case 'contact-done':root.innerHTML=contactDone();break;case 'ready':root.innerHTML=ready();break;case 'quiz':root.innerHTML=quizMarkup();break;case 'wait':root.innerHTML=waitMarkup();break;case 'error':root.innerHTML=errorMarkup();break;case 'result':root.innerHTML=resultMarkup();break;default:root.innerHTML=intro();}
+    if(st.stage==='contact'){try{const d=JSON.parse(sessionStorage.getItem('itpu-contact-pending')||'null'),f=document.getElementById('contact-form');if(d&&f){f.elements.phone.value=d.phone||'';f.elements.role.value=d.role||'';}}catch(_){}}
     save();
   }
   function phoneNumber(text){let n=String(text||'').replace(/\D/g,'');if(n.length===9)n='998'+n;return /^998\d{9}$/.test(n)?'+'+n:null;}
   function formError(message){const el=document.getElementById('reg-error');if(el){el.textContent=message;el.hidden=false;}}
+  async function submitContact(form){
+    if(st.processing)return;
+    const phone=phoneNumber(form.elements.phone.value),role=form.elements.role.value,error=document.getElementById('contact-error');
+    if(!phone||!role){error.textContent=!phone?T('errPhone'):T('contactRoleError');error.hidden=false;return;}
+    const button=document.getElementById('contact-submit');button.disabled=true;button.firstElementChild.textContent=T('contactSending');error.hidden=true;st.processing=true;
+    const key='itpu-contact-pending';let pending=null;try{pending=JSON.parse(sessionStorage.getItem(key)||'null');}catch(_){}
+    const id=pending?.phone===phone&&pending?.role===role&&pending?.id?pending.id:randomId();try{sessionStorage.setItem(key,JSON.stringify({phone,role,id}));}catch(_){}
+    try{if(!DEMO){const result=await submitBridge({action:'contact',id,eventId:C.eventId,phone,role,lang:LANGS[st.language],consent:true,consentVersion:'ITPU-CONTACT-2026-11'},'contact_saved');if(result.status!=='contact_saved')throw new Error('Not confirmed');}try{sessionStorage.removeItem(key);}catch(_){}transition('contact-done');}
+    catch(_){error.textContent=T('contactFail');error.hidden=false;button.disabled=false;button.firstElementChild.textContent=T('contactSubmit');}finally{st.processing=false;}
+  }
   async function register(form){
     if(st.processing)return;
     const firstName=form.elements.firstName.value.trim().replace(/\s+/g,' '),lastName=form.elements.lastName.value.trim().replace(/\s+/g,' '),name=`${firstName} ${lastName}`,phone=phoneNumber(form.elements.phone.value),grade=form.elements.grade.value,school=form.elements.school.value.trim(),age=form.elements.age.value;
@@ -280,6 +293,8 @@
     const button=event.target.closest('[data-action]');if(!button)return;
     switch(button.dataset.action){
       case 'intro-start':transition('form');break;
+      case 'contact-open':transition('contact');break;
+      case 'contact-back':if(!st.processing)transition('intro');break;
       case 'privacy':dialog.showModal();break;
       case 'quiz-start':startQuiz();break;
       case 'answer':choose(Number(button.dataset.answer));break;
@@ -289,7 +304,7 @@
       case 'replay':replay();break;
     }
   });
-  root.addEventListener('submit',event=>{if(event.target.id!=='lead-form')return;event.preventDefault();register(event.target);});
+  root.addEventListener('submit',event=>{if(event.target.id==='lead-form'){event.preventDefault();register(event.target);}else if(event.target.id==='contact-form'){event.preventDefault();submitContact(event.target);}});
   root.addEventListener('change',event=>{if(event.target.name==='age'){document.getElementById('minor-notice').hidden=event.target.value!=='minor';}});
   document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>setLanguage(b.dataset.lang)));
   document.getElementById('privacy-close').addEventListener('click',()=>dialog.close());
