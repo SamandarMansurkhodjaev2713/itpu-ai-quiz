@@ -1,8 +1,8 @@
 (() => {
   'use strict';
   const C = window.ITPU_CONFIG;
-  const CURRENT_Q=window.ITPU_QUESTIONS,LEGACY_Q=window.ITPU_LEGACY_QUESTIONS;
-  const QUESTION_VERSION='ai-advanced-20261111';
+  const CURRENT_Q=window.ITPU_QUESTIONS,ADVANCED_Q=window.ITPU_ADVANCED_QUESTIONS,LEGACY_Q=window.ITPU_LEGACY_QUESTIONS;
+  const QUESTION_VERSION='ai-sec2-20261111';
   let Q=CURRENT_Q;
   const WORDS = window.ITPU_COPY;
   const DEMO = C.mode === 'demo';
@@ -34,7 +34,7 @@
       const d=JSON.parse(sessionStorage.getItem(STORAGE)||'null');
       if(!d||!d.session||Date.now()-d.at>2*60*60*1000)return;
       if(!['ready','quiz','wait','result','error'].includes(d.stage))return;
-      if(d.questionVersion!==QUESTION_VERSION){if(!Array.isArray(LEGACY_Q)||LEGACY_Q.length!==10)return;Q=LEGACY_Q;st.questionVersion='legacy';}
+      if(d.questionVersion!==QUESTION_VERSION){const old=d.questionVersion==='ai-advanced-20261111'?ADVANCED_Q:LEGACY_Q;if(!Array.isArray(old)||old.length!==10)return;Q=old;st.questionVersion=d.questionVersion||'legacy';}
       st.session=d.session;st.index=Math.min(9,Math.max(0,d.index|0));st.answers=Array.isArray(d.answers)?d.answers:[];
       st.orders=d.orders||{};st.deadlineEpoch=Number(d.deadlineEpoch)||0;st.result=d.result||null;st.pending=d.pending||null;
       st.stage=d.stage==='wait'?'error':d.stage;
@@ -178,7 +178,7 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitSupabase({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-ADV-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitSupabase({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-11-SEC2-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
       st.session={id,guest:false,backend:'supabase'};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
