@@ -16,6 +16,7 @@
   const st = {language:0,stage:'intro',session:null,index:0,answers:[],orders:{},deadlineEpoch:0,locked:false,result:null,recap:false,processing:false,pending:null,questionVersion:QUESTION_VERSION};
   let frame=0,timeout=0,transitioning=false,queuedTransition=null,toastTimeout=0;
 
+  const sessionSeconds = () => !st.session ? C.seconds : Number(st.session.seconds) || (st.session.backend === 'supabase' ? 15 : st.questionVersion === 'legacy' ? 10 : 15);
   const L = value => Array.isArray(value) ? value[st.language] : value;
   const T = name => L(WORDS[name]) || name;
   const E = str => String(str??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -104,9 +105,9 @@
       <div class="reg-actions"><p id="reg-error" class="reg-error" role="alert" hidden></p><button type="submit" id="reg-submit" class="main-button"><span>${E(T('register'))}</span><span class="button-arrow" aria-hidden="true"></span></button></div>
       </form></div>
   </section>`;}
-  function contactMarkup(){return `<section class="contact-shell" aria-labelledby="contact-heading"><button class="back-link" type="button" data-action="contact-back">← ${E(T('back'))}</button><div class="contact-content"><h1 id="contact-heading">${E(T('contactTitle'))}</h1><p>${E(T('contactDesc'))}</p><form id="contact-form" novalidate><label class="field contact-phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="22" placeholder="+998 90 123 45 67" required></label><fieldset class="field contact-role"><legend>${E(T('contactRole'))} *</legend><div class="age-options"><label><input type="radio" name="role" value="applicant" required><span>${E(T('roleApplicant'))}</span></label><label><input type="radio" name="role" value="student"><span>${E(T('roleStudent'))}</span></label><label><input type="radio" name="role" value="parent"><span>${E(T('roleParent'))}</span></label></div></fieldset><p class="contact-consent">${E(T('contactConsent'))} <a href="${E(C.privacyUrl)}" target="_blank" rel="noopener noreferrer">${E(T('privacyOfficial'))}</a></p><p class="reg-error" id="contact-error" role="alert" hidden></p><button type="submit" id="contact-submit" class="main-button"><span>${E(T('contactSubmit'))}</span><span class="button-arrow" aria-hidden="true"></span></button></form></div></section>`;}
+  function contactMarkup(){return `<section class="contact-shell" aria-labelledby="contact-heading"><button class="back-link" type="button" data-action="contact-back">← ${E(T('back'))}</button><div class="contact-content"><h1 id="contact-heading">${E(T('contactTitle'))}</h1><p>${E(T('contactDesc'))}</p><form id="contact-form" novalidate><div class="contact-names"><label class="field"><span>${E(T('firstName'))} *</span><input name="firstName" maxlength="44" autocomplete="given-name" required></label><label class="field"><span>${E(T('lastName'))} *</span><input name="lastName" maxlength="44" autocomplete="family-name" required></label></div><label class="field contact-phone"><span>${E(T('phone'))} *</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="22" placeholder="+998 90 123 45 67" required></label><fieldset class="field contact-role"><legend>${E(T('contactRole'))} *</legend><div class="age-options"><label><input type="radio" name="role" value="applicant" required><span>${E(T('roleApplicant'))}</span></label><label><input type="radio" name="role" value="student"><span>${E(T('roleStudent'))}</span></label><label><input type="radio" name="role" value="parent"><span>${E(T('roleParent'))}</span></label></div></fieldset><p class="contact-consent">${E(T('contactConsent'))} <a href="${E(C.privacyUrl)}" target="_blank" rel="noopener noreferrer">${E(T('privacyOfficial'))}</a></p><p class="reg-error" id="contact-error" role="alert" hidden></p><button type="submit" id="contact-submit" class="main-button"><span>${E(T('contactSubmit'))}</span><span class="button-arrow" aria-hidden="true"></span></button></form></div></section>`;}
   function contactDone(){return `<section class="contact-shell contact-done"><div class="contact-content"><h1>${E(T('contactDone'))}</h1><p>${E(T('contactDoneText'))}</p><button class="secondary-button" type="button" data-action="contact-back">${E(T('backHome'))}</button></div></section>`;}
-  function ready(){return `<section class="ready ready-new" aria-labelledby="ready-heading"><div class="ready-kicker">ITPU AI QUIZ</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText'))}</p><div class="ready-facts"><span><b>10</b>${E(T('questions'))}</span><span><b>${C.seconds}s</b>${E(T('seconds'))}</span><span><b>8/10</b>${E(T('prize'))}</span></div>${btn(T('readyGo'),'quiz-start')}</section>`;}
+  function ready(){return `<section class="ready ready-new" aria-labelledby="ready-heading"><div class="ready-kicker">ITPU AI QUIZ</div><h1 id="ready-heading">${E(T('readyTitle'))}</h1><p>${E(T('readyText').replace('{seconds}',String(sessionSeconds())))}</p><div class="ready-facts"><span><b>10</b>${E(T('questions'))}</span><span><b>${sessionSeconds()}s</b>${E(T('seconds'))}</span><span><b>8/10</b>${E(T('prize'))}</span></div>${btn(T('readyGo'),'quiz-start')}</section>`;}
   function orderFor(q){
     if(st.orders[q.id]?.length===5)return st.orders[q.id];
     const arr=[0,1,2,3,4];for(let i=4;i>0;i--){const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[arr[i],arr[j]]=[arr[j],arr[i]];}
@@ -118,7 +119,7 @@
       <div class="quiz-head"><div class="quiz-index">${E(T('question'))} <b>${String(st.index+1).padStart(2,'0')}</b> / 10</div><small>ITPU AI EXPERIENCE</small></div>
       <div class="progress" role="progressbar" aria-valuenow="${st.index+1}" aria-valuemin="1" aria-valuemax="10"><span style="width:${st.index*10}%"></span></div>
       <div class="quiz-grid"><div class="question-side"><div><div class="question-tag">${E(L(q.tag))}</div><h1 id="question-title">${E(L(q.q))}</h1></div>
-        <div class="timer-block"><div class="timer" role="timer" aria-label="${E(T('left'))}"><svg viewBox="0 0 110 110" aria-hidden="true"><circle class="timer-track" cx="55" cy="55" r="48"/><circle id="timer-progress" class="timer-progress" cx="55" cy="55" r="48" stroke-dasharray="301.593" stroke-dashoffset="0"/></svg><strong id="time-count">${C.seconds}</strong></div><div class="timer-label"><span>${E(T('left'))}</span><b id="quiz-hint">${E(T('choose'))}</b></div></div>
+        <div class="timer-block"><div class="timer" role="timer" aria-label="${E(T('left'))}"><svg viewBox="0 0 110 110" aria-hidden="true"><circle class="timer-track" cx="55" cy="55" r="48"/><circle id="timer-progress" class="timer-progress" cx="55" cy="55" r="48" stroke-dasharray="301.593" stroke-dashoffset="0"/></svg><strong id="time-count">${sessionSeconds()}</strong></div><div class="timer-label"><span>${E(T('left'))}</span><b id="quiz-hint">${E(T('choose'))}</b></div></div>
       </div><div class="answers" role="group" aria-label="${E(T('choose'))}">${order.map((answerIndex,i)=>`<button class="answer" type="button" data-action="answer" data-answer="${answerIndex}"><span class="answer-key" aria-hidden="true">${'ABCDE'[i]}</span><span class="answer-text">${E(L(q.a[answerIndex]))}</span><span class="answer-arrow" aria-hidden="true"></span></button>`).join('')}</div></div>
       <div class="quiz-foot"><span>ITPU / THINK FORWARD</span><span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>
     </section>`;
@@ -146,19 +147,19 @@
     document.body.dataset.stage=st.stage;
     root.classList.remove('enter');void root.offsetWidth;root.classList.add('enter');
     switch(st.stage){case 'intro':root.innerHTML=intro();break;case 'form':root.innerHTML=formMarkup();break;case 'contact':root.innerHTML=contactMarkup();break;case 'contact-done':root.innerHTML=contactDone();break;case 'ready':root.innerHTML=ready();break;case 'quiz':root.innerHTML=quizMarkup();break;case 'wait':root.innerHTML=waitMarkup();break;case 'error':root.innerHTML=errorMarkup();break;case 'result':root.innerHTML=resultMarkup();break;default:root.innerHTML=intro();}
-    if(st.stage==='contact'){try{const d=JSON.parse(sessionStorage.getItem('itpu-contact-pending')||'null'),f=document.getElementById('contact-form');if(d&&f){f.elements.phone.value=d.phone||'';f.elements.role.value=d.role||'';}}catch(_){}}
+    if(st.stage==='contact'){try{const d=JSON.parse(sessionStorage.getItem('itpu-contact-pending')||'null'),f=document.getElementById('contact-form');if(d&&f){f.elements.phone.value=d.phone||'';f.elements.role.value=d.role||'';f.elements.firstName.value=d.firstName||'';f.elements.lastName.value=d.lastName||'';}}catch(_){}}
     save();
   }
   function phoneNumber(text){let n=String(text||'').replace(/\D/g,'');if(n.length===9)n='998'+n;return /^998\d{9}$/.test(n)?'+'+n:null;}
   function formError(message){const el=document.getElementById('reg-error');if(el){el.textContent=message;el.hidden=false;}}
   async function submitContact(form){
     if(st.processing)return;
-    const phone=phoneNumber(form.elements.phone.value),role=form.elements.role.value,error=document.getElementById('contact-error');
-    if(!phone||!role){error.textContent=!phone?T('errPhone'):T('contactRoleError');error.hidden=false;return;}
+    const firstName=form.elements.firstName.value.trim().replace(/\s+/g,' '),lastName=form.elements.lastName.value.trim().replace(/\s+/g,' '),phone=phoneNumber(form.elements.phone.value),role=form.elements.role.value,error=document.getElementById('contact-error');
+    if(!firstName||!lastName||!phone||!role){error.textContent=!firstName||!lastName?T('errName'):!phone?T('errPhone'):T('contactRoleError');error.hidden=false;return;}
     const button=document.getElementById('contact-submit');button.disabled=true;button.firstElementChild.textContent=T('contactSending');error.hidden=true;st.processing=true;
     const key='itpu-contact-pending';let pending=null;try{pending=JSON.parse(sessionStorage.getItem(key)||'null');}catch(_){}
-    const id=pending?.phone===phone&&pending?.role===role&&pending?.id?pending.id:randomId();try{sessionStorage.setItem(key,JSON.stringify({phone,role,id}));}catch(_){}
-    try{if(!DEMO){const result=await submitSupabase({action:'contact',id,eventId:C.eventId,phone,role,lang:LANGS[st.language],consent:true,consentVersion:'ITPU-CONTACT-2026-11'},'contact_saved');if(result.status!=='contact_saved')throw new Error('Not confirmed');}try{sessionStorage.removeItem(key);}catch(_){}transition('contact-done');}
+    const id=pending?.phone===phone&&pending?.role===role&&(!pending.firstName||pending.firstName===firstName)&&(!pending.lastName||pending.lastName===lastName)&&pending?.id?pending.id:randomId();try{sessionStorage.setItem(key,JSON.stringify({phone,role,firstName,lastName,id}));}catch(_){}
+    try{if(!DEMO){const result=await submitSupabase({action:'contact',id,eventId:C.eventId,phone,role,firstName,lastName,lang:LANGS[st.language],consent:true,consentVersion:'ITPU-CONTACT-2026-11-NAMES'},'contact_saved');if(result.status!=='contact_saved')throw new Error('Not confirmed');}try{sessionStorage.removeItem(key);}catch(_){}transition('contact-done');}
     catch(_){error.textContent=T('contactFail');error.hidden=false;button.disabled=false;button.firstElementChild.textContent=T('contactSubmit');}finally{st.processing=false;}
   }
   async function register(form){
@@ -178,16 +179,16 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitSupabase({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-11-SEC2-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitSupabase({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-12-SEC2-20S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
-      st.session={id,guest:false,backend:'supabase'};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
+      st.session={id,guest:false,backend:'supabase',seconds:C.seconds};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
   }
   function startQuiz(){if(!st.session||st.processing)return;if(transitioning){setTimeout(startQuiz,500);return;}st.answers=[];st.orders={};st.index=0;st.deadlineEpoch=0;st.locked=false;if(DEMO)transition('quiz',()=>timer(true));else {st.pending={action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}}
   function timer(newQuestion){
     cancelAnimationFrame(frame);
     if(st.stage!=='quiz'||st.locked)return;
-    if(newQuestion||!st.deadlineEpoch)st.deadlineEpoch=Date.now()+C.seconds*1000;
+    if(newQuestion||!st.deadlineEpoch)st.deadlineEpoch=Date.now()+sessionSeconds()*1000;
     save();
     const value=document.getElementById('time-count'),ring=document.getElementById('timer-progress'),shell=document.getElementById('quiz-shell');if(!value||!ring)return;
     let lastDraw=0,lastNumber=-1,wasUrgent=null;
@@ -195,7 +196,7 @@
       if(st.stage!=='quiz'||st.locked)return;
       const now=Date.now(),left=Math.max(0,st.deadlineEpoch-now),number=Math.ceil(left/1000),urgent=left<=3000;
       if(number!==lastNumber){value.textContent=String(number);lastNumber=number;}
-      if(!lastDraw||now-lastDraw>=100||left<=0){ring.setAttribute('stroke-dashoffset',String(301.593*(1-left/(C.seconds*1000))));lastDraw=now;}
+      if(!lastDraw||now-lastDraw>=100||left<=0){ring.setAttribute('stroke-dashoffset',String(301.593*(1-left/(sessionSeconds()*1000))));lastDraw=now;}
       if(urgent!==wasUrgent){shell.classList.toggle('urgent',urgent);wasUrgent=urgent;}
       if(left<=0){choose(null);return;}frame=requestAnimationFrame(run);
     };run();
@@ -204,7 +205,7 @@
     if(st.stage!=='quiz'||st.locked)return;
     if(Date.now()>=st.deadlineEpoch)answer=null;
     st.locked=true;cancelAnimationFrame(frame);
-    const q=Q[st.index],elapsed=answer===null?C.seconds*1000:Math.max(0,Math.min(C.seconds*1000,C.seconds*1000-(st.deadlineEpoch-Date.now())));
+    const q=Q[st.index],elapsed=answer===null?sessionSeconds()*1000:Math.max(0,Math.min(sessionSeconds()*1000,sessionSeconds()*1000-(st.deadlineEpoch-Date.now())));
     st.answers=st.answers.filter(a=>a.id!==q.id);st.answers.push({id:q.id,answer,timeMs:Math.round(elapsed)});
     document.querySelectorAll('.answer').forEach(b=>{b.disabled=true;if(Number(b.dataset.answer)===answer)b.classList.add('selected');else b.classList.add('locked');});
     document.getElementById('quiz-hint').textContent=answer===null?T('timeout'):T('locked');save();
@@ -225,7 +226,7 @@
         st.pending=null;st.locked=false;st.answers=result.answers;st.result={score:result.score,correct:result.correct,claimCode:result.claimCode||''};st.recap=false;st.deadlineEpoch=0;transition('result');
       }else{
         if(result.status!=='playing'||!Number.isInteger(result.index)||result.index<0||result.index>9)throw new Error('Invalid progress');
-        st.pending=null;st.locked=false;st.index=result.index;st.deadlineEpoch=Date.now()+Math.max(0,Math.min(C.seconds*1000,Number(result.remainingMs)||0));enterStage('quiz');timer(false);
+        st.pending=null;st.locked=false;st.index=result.index;st.deadlineEpoch=Date.now()+Math.max(0,Math.min(sessionSeconds()*1000,Number(result.remainingMs)||0));enterStage('quiz');timer(false);
       }
     }catch(err){enterStage('error');}finally{st.processing=false;}
   }
