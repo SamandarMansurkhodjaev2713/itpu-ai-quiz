@@ -158,7 +158,7 @@
     const button=document.getElementById('contact-submit');button.disabled=true;button.firstElementChild.textContent=T('contactSending');error.hidden=true;st.processing=true;
     const key='itpu-contact-pending';let pending=null;try{pending=JSON.parse(sessionStorage.getItem(key)||'null');}catch(_){}
     const id=pending?.phone===phone&&pending?.role===role&&pending?.id?pending.id:randomId();try{sessionStorage.setItem(key,JSON.stringify({phone,role,id}));}catch(_){}
-    try{if(!DEMO){const result=await submitBridge({action:'contact',id,eventId:C.eventId,phone,role,lang:LANGS[st.language],consent:true,consentVersion:'ITPU-CONTACT-2026-11'},'contact_saved');if(result.status!=='contact_saved')throw new Error('Not confirmed');}try{sessionStorage.removeItem(key);}catch(_){}transition('contact-done');}
+    try{if(!DEMO){const result=await submitSupabase({action:'contact',id,eventId:C.eventId,phone,role,lang:LANGS[st.language],consent:true,consentVersion:'ITPU-CONTACT-2026-11'},'contact_saved');if(result.status!=='contact_saved')throw new Error('Not confirmed');}try{sessionStorage.removeItem(key);}catch(_){}transition('contact-done');}
     catch(_){error.textContent=T('contactFail');error.hidden=false;button.disabled=false;button.firstElementChild.textContent=T('contactSubmit');}finally{st.processing=false;}
   }
   async function register(form){
@@ -178,9 +178,9 @@
     const id=pending?.phone===phone&&pending?.id?pending.id:randomId();
     try{sessionStorage.setItem(pendingKey,JSON.stringify({phone,id}));}catch(_){}
     try{
-      if(!DEMO){const response=await submitBridge({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-ADV-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
+      if(!DEMO){const response=await submitSupabase({action:'register',id,eventId:C.eventId,name,phone,grade,school,age,guardian,consent,marketing,lang:LANGS[st.language],consentVersion:'ITPU-QUIZ-2026-11-10-BUTTON-ADV-15S'},'registered');if(response.status==='duplicate')throw new Error('duplicate');if(response.status!=='registered')throw new Error('unconfirmed');}
       try{sessionStorage.removeItem(pendingKey);}catch(_){}
-      st.session={id,guest:false};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
+      st.session={id,guest:false,backend:'supabase'};st.answers=[];st.orders={};st.index=0;st.result=null;st.deadlineEpoch=0;transition('ready');
     }catch(err){formError(err.message==='duplicate'?T('duplicate'):T('regFail'));button.disabled=false;button.firstElementChild.textContent=T('register');}finally{st.processing=false;}
   }
   function startQuiz(){if(!st.session||st.processing)return;if(transitioning){setTimeout(startQuiz,500);return;}st.answers=[];st.orders={};st.index=0;st.deadlineEpoch=0;st.locked=false;if(DEMO)transition('quiz',()=>timer(true));else {st.pending={action:'start',id:st.session.id,eventId:C.eventId,guest:st.session.guest};liveStep();}}
@@ -219,7 +219,7 @@
     if(st.processing||!st.pending)return;
     st.processing=true;cancelAnimationFrame(frame);enterStage('wait');
     try{
-      const payload=st.pending,result=await submitBridge(payload,payload.action==='start'?'playing':'advanced');
+      const payload=st.pending,result=await (st.session?.backend==='supabase'?submitSupabase(payload):submitBridge(payload,payload.action==='start'?'playing':'advanced'));
       if(result.status==='finished'){
         if(!Number.isInteger(result.score)||!result.correct||!Array.isArray(result.answers))throw new Error('Invalid result');
         st.pending=null;st.locked=false;st.answers=result.answers;st.result={score:result.score,correct:result.correct,claimCode:result.claimCode||''};st.recap=false;st.deadlineEpoch=0;transition('result');
@@ -264,6 +264,20 @@
       const timeoutId=setTimeout(()=>{cleanup();reject(new Error('Status timed out'));},7000);
       window[callback]=data=>{cleanup();resolve(data);};script.onerror=()=>{cleanup();reject(new Error('Status failed'));};script.src=url.toString();document.head.appendChild(script);
     });
+  }
+  async function submitSupabase(payload){
+    const endpoint='https://khtkjsfvzarsotwxroep.supabase.co/rest/v1/rpc/itpu_action';
+    const key='sb_publishable_H3ncpjWgzCHoJ3uqb6aORQ_EIG37RxN';
+    for(let attempt=0;attempt<4;attempt++){
+      if(attempt)await sleep(400*attempt+Math.random()*500);
+      try{
+        const controller=new AbortController(),timeoutId=setTimeout(()=>controller.abort(),15000);
+        let response;try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',apikey:key},body:JSON.stringify({payload}),signal:controller.signal});}finally{clearTimeout(timeoutId);}
+        if(!response.ok){if(response.status>=400&&response.status<500&&response.status!==429)throw new Error('Invalid request');throw new Error('Temporary failure');}
+        const result=await response.json();if(!result||typeof result.status!=='string')throw new Error('Invalid response');return result;
+      }catch(err){if(err.message==='Invalid request'||attempt===3)throw err;}
+    }
+    throw new Error('No confirmation');
   }
   async function submitBridge(payload,required){
     if(!/^https:\/\/script\.google\.com\/macros\/s\//.test(C.endpoint))throw new Error('Invalid endpoint');
